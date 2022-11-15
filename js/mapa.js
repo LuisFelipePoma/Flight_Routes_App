@@ -19,7 +19,7 @@ json('https://assets.codepen.io/911796/custom.geo.json').then(data => init(data)
 const init = (data) => {
     console.log(width, height);
     geojson = data
-    // csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_connectionmap.csv").then(routes => DrawRoutes(routes))
+    csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_connectionmap.csv").then(routes => DrawRoutes(routes))
     drawGlobe()
     drawGraticule()
     renderInfo()
@@ -100,6 +100,7 @@ const createDraggingEvents = () => {
                 projection.rotate([rotation.x, rotation.y])
                 selectAll('.country').attr('d', path)
                 selectAll('.graticule').attr('d', path(graticule()))
+                selectAll('.Links').attr("d", function (d) { return path(d) })
             }
         })
 }
@@ -153,6 +154,7 @@ const DrawRoutes = (routes) => {
         .enter()
         .append("path")
         .attr("d", function (d) { return path(d) })
+        .attr("class","Links")
         .style("fill", "none")
         .style("stroke", "#69b3a2")
         .style("stroke-width", 2)
