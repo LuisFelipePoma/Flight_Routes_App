@@ -13,7 +13,7 @@ const globeSize = {
     h: height * 0.90,
 }
 
-json('https://assets.codepen.io/911796/custom.geo.json').then(data => init(data))
+json('https://raw.githubusercontent.com/LuisFelipePoma/D3-graph-gallery/master/DATA/world.geojson').then(data => init(data))
 
 
 const init = (data) => {
