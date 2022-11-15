@@ -21,7 +21,18 @@ svg {
   color: white;
   padding: 30px;
 }
-
+#mapa {
+  
+  color: white;
+  border-width: 3px;
+  border-style: solid;
+  border-image: 
+    linear-gradient(
+      to bottom, 
+      purple, 
+      rgba(0,0,255,.1)
+    ) 1 100%;
+}
 
 #selectAirport {
   left: 500px;
@@ -54,4 +65,10 @@ svg {
   fill: #33415c;
   stroke: #060a0f;
   transition: fill .5s;
+}
+.thisOption {
+  color: green !important;
+}
+.options{
+  color : #6ea9ff;
 }
