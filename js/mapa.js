@@ -1,6 +1,6 @@
-const { json, select, selectAll, geoOrthographic, geoPath, geoGraticule, csv, geoMercator, set } = d3;
+const { json, select, selectAll, geoOrthographic, geoPath, geoGraticule, csv, geoMercator, set, easeElastic, transition, forceSimulation } = d3;
 
-var geojson, globe, projection, path, graticule, isMouseDown = false, rotation = { x: 0, y: 0 }, link = [], routescsv, routejson;
+var geojson, globe, projection, path, graticule, isMouseDown = false, rotation = { x: 0, y: 0 }, routescsv, routejson;
 
 const width = document.querySelector("#mapa").clientWidth;
 const height = document.querySelector("#mapa").clientHeight - 25;
@@ -14,34 +14,34 @@ const globeSize = {
 }
 
 const worldURI = 'https://raw.githubusercontent.com/LuisFelipePoma/D3-graph-gallery/master/DATA/world.geojson';
-const nodesURI = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/nodes.json';
+const nodesURI = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/routes.json';
 const testURI = 'https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_connectionmap.csv';
 
 
-var promises = [json(worldURI), csv(testURI)]
+var promises = [json(worldURI), json(nodesURI)]
 myDataPromises = Promise.all(promises)
 
 myDataPromises.then(function (data) {
-    init(data[0],data[1]);
+    init(data[0], data[1]);
 })
 myDataPromises.catch(function () {
     console.log('Something has gone wrong. No load Data (csv,json)')
 })
 
 
+let activateList = false;
 
 
 
 
 
 
-
-const init = (worlds,routes) => {
-    routejson = routes
+const init = (worlds, routes) => {
     geojson = worlds
+    routejson = routes
     drawGlobe()
-    drawRoutes()
-    drawGraticule()
+    drawNodes()
+    // drawGraticule()
     renderInfo()
     createHoverEffect()
     createSelectionEvent()
@@ -52,10 +52,15 @@ const drawGlobe = () => {
 
     globe = select('#mapa')
         .append('svg')
-        .attr('width', height)
+        .attr('width', width)
         .attr('height', height)
+        .style("fill", "#DDDDDD")
+        .style("box-shadow", "0 6px 30px rgba(0, 0, 0, 0.356), 0 0 6px rgba(0, 0, 0, 0.05)")
+        .style("display", "block")
 
-    projection = geoOrthographic()
+    projection = geoMercator()
+        .scale(210)
+        .center([0, 20])
         .fitSize([globeSize.w, globeSize.h], geojson)
         .translate([height - globeSize.w / 2, height / 2])
 
@@ -69,23 +74,7 @@ const drawGlobe = () => {
         .attr('class', 'country noSelected selected howerOff howerPass')
         .classed('selected', false).classed('howerPass', false)
 };
-const drawRoutes = () => {
-    routejson.forEach(function (row) {
-        source = [+row.long1, +row.lat1]
-        target = [+row.long2, +row.lat2]
-        topush = { type: "LineString", coordinates: [source, target] }
-        link.push(topush)
-    })
-    globe.selectAll("myPath")
-        .data(link)
-        .enter()
-        .append("path")
-        .attr("d", function (d) { return path(d) })
-        .attr("class", "Links")
-        .style("fill", "none")
-        .style("stroke", "#69b3a2")
-        .style("stroke-width", 2)
-};
+
 const drawGraticule = () => {
 
     graticule = geoGraticule()
@@ -115,7 +104,8 @@ const createHoverEffect = () => {
             const { name } = d.properties
             infoPanel.html(`<h2>${name}</h2><hr>`)
             globe.selectAll('.country').classed('howerPass', false).classed('howerOff', true)
-            select(this).classed('howerOff', false).classed("howerPass", true)
+            select(this).classed('howerOff', false).classed("howerPass", true);
+            globe.selectAll('.links').attr('display', 'flex');
         })
         .on("mouseout", function (e, d) {
             globe.selectAll('.country').classed("howerPass", false).classed('howerOff', true)
@@ -138,7 +128,7 @@ const createDraggingEvents = () => {
                 projection.rotate([rotation.x, rotation.y])
                 selectAll('.country').attr('d', path)
                 selectAll('.graticule').attr('d', path(graticule()))
-                selectAll('.Links').attr("d", function (d) { return path(d) })
+                selectAll('.circle').attr("d", function (d) { return path(d) })
             }
         })
 };
@@ -165,7 +155,7 @@ const createSelectionEvent = () => {
 
 const saveCountries = (d) => {
     const { name, type, economy, income_grp } = d.properties
-    let tipos = `<ul><li>${type}</li><li>${economy}</li><li>${income_grp}</li></ul>`
+    let tipos = `<ul><li class = "options ">${type}</li ><li class = "options ">${economy}</li><li class = "options ">${income_grp}</li></ul>`
     if (choice == false) {
         let dates = `<p>Origen : ${name}</p>`;
         document.getElementById("origen").innerHTML = dates
@@ -179,3 +169,4 @@ const saveCountries = (d) => {
         choice = false;
     }
 };
+
