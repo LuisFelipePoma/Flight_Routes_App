@@ -1,8 +1,8 @@
-const { json, select, selectAll, geoOrthographic, geoPath, geoGraticule, csv, geoMercator, set } = d3
+const { json, select, selectAll, geoOrthographic, geoPath, geoGraticule, csv, geoMercator, set } = d3;
 
-var geojson, globe, projection, path, graticule, isMouseDown = false, rotation = { x: 0, y: 0 }, link = [], routescsv, route
+var geojson, globe, projection, path, graticule, isMouseDown = false, rotation = { x: 0, y: 0 }, link = [], routescsv, routejson;
 
-const width = document.querySelector("#mapa").clientWidth
+const width = document.querySelector("#mapa").clientWidth;
 const height = document.querySelector("#mapa").clientHeight - 25;
 
 let origin, infoPanel, destiny;
@@ -13,14 +13,35 @@ const globeSize = {
     h: height * 0.90,
 }
 
-json('https://raw.githubusercontent.com/LuisFelipePoma/D3-graph-gallery/master/DATA/world.geojson').then(data => init(data))
+const worldURI = 'https://raw.githubusercontent.com/LuisFelipePoma/D3-graph-gallery/master/DATA/world.geojson';
+const nodesURI = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/nodes.json';
+const testURI = 'https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_connectionmap.csv';
 
 
-const init = (data) => {
+var promises = [json(worldURI), csv(testURI)]
+myDataPromises = Promise.all(promises)
+
+myDataPromises.then(function (data) {
+    init(data[0],data[1]);
+})
+myDataPromises.catch(function () {
+    console.log('Something has gone wrong.')
+})
+
+
+
+
+
+
+
+
+
+const init = (worlds,routes) => {
     console.log(width, height);
-    geojson = data
-    csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_connectionmap.csv").then(routes => DrawRoutes(routes))
+    routejson = routes
+    geojson = worlds
     drawGlobe()
+    drawRoutes()
     drawGraticule()
     renderInfo()
     createHoverEffect()
@@ -48,7 +69,25 @@ const drawGlobe = () => {
         .attr('d', path)
         .attr('class', 'country noSelected selected howerOff howerPass')
         .classed('selected', false).classed('howerPass', false)
-}
+};
+const drawRoutes = () => {
+    routejson.forEach(function (row) {
+        source = [+row.long1, +row.lat1]
+        target = [+row.long2, +row.lat2]
+        topush = { type: "LineString", coordinates: [source, target] }
+        link.push(topush)
+    })
+    console.log(link)
+    globe.selectAll("myPath")
+        .data(link)
+        .enter()
+        .append("path")
+        .attr("d", function (d) { return path(d) })
+        .attr("class", "Links")
+        .style("fill", "none")
+        .style("stroke", "#69b3a2")
+        .style("stroke-width", 2)
+};
 const drawGraticule = () => {
 
     graticule = geoGraticule()
@@ -60,14 +99,14 @@ const drawGraticule = () => {
         .attr('fill', 'none')
         .attr('stroke', '#232323')
 
-}
+};
 
 // CREA ELEMENTOS(labels) PARA IMPRIMIR EN PANTALLA
 const renderInfo = () => {
     infoPanel = select('#info')
     origin = select('#origin')
     destiny = select('#destiny')
-}
+};
 
 // CREA LAS ANIMACIONES DE ARRASTRE Y COLOREO, tambien pasa datos a los labels
 const createHoverEffect = () => {
@@ -83,7 +122,8 @@ const createHoverEffect = () => {
         .on("mouseout", function (e, d) {
             globe.selectAll('.country').classed("howerPass", false).classed('howerOff', true)
         });
-}
+};
+
 const createDraggingEvents = () => {
 
     globe
@@ -103,7 +143,8 @@ const createDraggingEvents = () => {
                 selectAll('.Links').attr("d", function (d) { return path(d) })
             }
         })
-}
+};
+
 const createSelectionEvent = () => {
 
     globe
@@ -122,7 +163,7 @@ const createSelectionEvent = () => {
                 select(this).classed('noSelected', true);
             }
         })
-}
+};
 
 const saveCountries = (d) => {
     const { name, type, economy, income_grp } = d.properties
@@ -139,23 +180,4 @@ const saveCountries = (d) => {
         document.getElementById("destino-list").innerHTML = tipos
         choice = false;
     }
-}
-
-const DrawRoutes = (routes) => {
-    routes.forEach(function (row) {
-        source = [+row.long1, +row.lat1]
-        target = [+row.long2, +row.lat2]
-        topush = { type: "LineString", coordinates: [source, target] }
-        link.push(topush)
-    })
-    console.log(link)
-    globe.selectAll("myPath")
-        .data(link)
-        .enter()
-        .append("path")
-        .attr("d", function (d) { return path(d) })
-        .attr("class","Links")
-        .style("fill", "none")
-        .style("stroke", "#69b3a2")
-        .style("stroke-width", 2)
 };
