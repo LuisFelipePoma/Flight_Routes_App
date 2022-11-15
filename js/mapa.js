@@ -75,8 +75,8 @@ const createHoverEffect = () => {
     globe
         .selectAll('.country')
         .on('mouseover', function (e, d) {
-            const { formal_en } = d.properties
-            infoPanel.html(`<h2>${formal_en}</h2><hr>`)
+            const { name } = d.properties
+            infoPanel.html(`<h2>${name}</h2><hr>`)
             globe.selectAll('.country').classed('howerPass', false).classed('howerOff', true)
             select(this).classed('howerOff', false).classed("howerPass", true)
         })
@@ -125,16 +125,16 @@ const createSelectionEvent = () => {
 }
 
 const saveCountries = (d) => {
-    const { formal_en, type, economy, income_grp } = d.properties
+    const { name, type, economy, income_grp } = d.properties
     let tipos = `<ul><li>${type}</li><li>${economy}</li><li>${income_grp}</li></ul>`
     if (choice == false) {
-        let dates = `<p>Origen : ${formal_en}</p>`;
+        let dates = `<p>Origen : ${name}</p>`;
         document.getElementById("origen").innerHTML = dates
         document.getElementById("origen-list").innerHTML = tipos
         choice = true;
     }
     else {
-        let dates = `<p>Destino : ${formal_en}</p>`;
+        let dates = `<p>Destino : ${name}</p>`;
         document.getElementById("destino").innerHTML = dates
         document.getElementById("destino-list").innerHTML = tipos
         choice = false;
