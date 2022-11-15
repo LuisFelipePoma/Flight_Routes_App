@@ -25,7 +25,7 @@ myDataPromises.then(function (data) {
     init(data[0],data[1]);
 })
 myDataPromises.catch(function () {
-    console.log('Something has gone wrong.')
+    console.log('Something has gone wrong. No load Data (csv,json)')
 })
 
 
@@ -37,7 +37,6 @@ myDataPromises.catch(function () {
 
 
 const init = (worlds,routes) => {
-    console.log(width, height);
     routejson = routes
     geojson = worlds
     drawGlobe()
@@ -77,7 +76,6 @@ const drawRoutes = () => {
         topush = { type: "LineString", coordinates: [source, target] }
         link.push(topush)
     })
-    console.log(link)
     globe.selectAll("myPath")
         .data(link)
         .enter()
