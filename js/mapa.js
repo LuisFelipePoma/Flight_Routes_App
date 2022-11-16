@@ -1,35 +1,46 @@
+//<----------------------------------------------------------   Variables globales -------------------------------------------------------------------->//
+
+// Variables para manera la liberia D3.js
 const { json, select, selectAll, geoOrthographic, geoPath,
     geoGraticule, csv, geoMercator, set, easeElastic,
     transition, forceSimulation, forceLink, forceManyBody,
     forceCenter } = d3;
+
+// Variables para las medidas del navegador y del div donde estara el mapa
 const width = document.querySelector("#mapa").clientWidth;
 const height = document.querySelector("#mapa").clientHeight - 10;
 const globeSize = {
     w: width * 0.90,
     h: height * 0.90,
 }
-
+// Variables necesarias para graficar en el svg el mapa
 let globe, projection, path, graticule;
-let geojson, airportjson, routesjson, linksjson;
-let origin, infoPanel, destiny;
 
+// Varibales para las rutas y aeropuertos
 let nodes, links = [];
 
+// Variables para guardar los dataSets
+let geojson, airportjson, routesjson, linksjson;
+
+// Variables pára crear elementos en el HTML
+let origin, infoPanel, destiny;
+
+// Variables para las animaciones
 let choice = false;
 let activateList = false;
 let isMouseDown = false, rotation = { x: 0, y: 0 };
 
-
+// Variables para guardar los links de las datasets
 const worldURL = 'https://raw.githubusercontent.com/LuisFelipePoma/D3-graph-gallery/master/DATA/world.geojson';
 const airportsURL = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/datasets/V3/airports.json';
-const routesURL = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/datasets/V3/routes.json';
+const routesURL = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/datasets/LITE/router.json';
 const linksURL = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/datasets/V2/links.json'
+
+// <------------------------------------------------------------------- Verificacion de la lectura de los datos ------------------------------------>//
 
 
 var promises = [json(worldURL), json(airportsURL), json(routesURL), json(linksURL)]
 myDataPromises = Promise.all(promises)
-
-//
 myDataPromises.then(function (data) {
     init(data[0], data[1], data[2], data[3]);
 })
@@ -37,11 +48,7 @@ myDataPromises.catch(function () {
     console.log('Something has gone wrong. No load Data.')
 })
 
-
-
-//poner comentarios
-
-
+// <---------------------------------------------------------------- Funcion Init ---------------------------------------------------------------->//
 
 const init = (worlds, airports, routes, coords) => {
     geojson = worlds
@@ -57,7 +64,9 @@ const init = (worlds, airports, routes, coords) => {
     createSelectionEvent()
     createDraggingEvents()
 }
-// DIBUJA MAPA Y RETICULAS
+// <------------------------------------------------------------------ Funciones ------------------------------------------------------------------>//
+
+// DIBUJA MAPA 
 const drawGlobe = () => {
 
     globe = select('#mapa')
@@ -82,7 +91,18 @@ const drawGlobe = () => {
 
 };
 
+// DIBUJA RETICULA
+const drawGraticule = () => {
 
+    graticule = geoGraticule()
+
+    globe
+        .append('path')
+        .attr('class', 'graticule')
+        .attr('d', path(graticule()))
+};
+
+// DIBUJA LOS AEROUPUERTOS
 const drawNodes = () => {
     nodes = globe.selectAll('g')
         .data(airportjson)
@@ -94,33 +114,26 @@ const drawNodes = () => {
         .append("circle")
         .attr('r', 1.5)
 }
+
+//DIBUJA LAS RUTAS
 const drawRoutes = () => {
     
-    // routesjson.forEach(function(row){
-    //   source = [+row.origin_lon, +row.origin_lat]
-    //   target = [+row.destination_lon, +row.destination_lat]
-    //   topush = {type: "LineString", coordinates: [source, target]}
-    //   links.push(topush)
-    // })
-    // console.log(routesjson)
-    // console.log(links)
+    routesjson.forEach(function(row){
+      source = [+row.origin_lon, +row.origin_lat]
+      target = [+row.destination_lon, +row.destination_lat]
+      topush = {type: "LineString", coordinates: [source, target]}
+      links.push(topush)
+    })
+    console.log(routesjson)
+    console.log(links)
     globe.selectAll("myPath")
-        .data(linksjson)
+        .data(links)
         .enter()
         .append("path")
         .attr("class", "rutas")
         .attr("d", function (d) { return path(d) })
 }
 
-const drawGraticule = () => {
-
-    graticule = geoGraticule()
-
-    globe
-        .append('path')
-        .attr('class', 'graticule')
-        .attr('d', path(graticule()))
-};
 
 // CREA ELEMENTOS(labels) PARA IMPRIMIR EN PANTALLA
 const renderInfo = () => {
@@ -129,7 +142,7 @@ const renderInfo = () => {
     destiny = select('#destiny')
 };
 
-// CREA LAS ANIMACIONES DE ARRASTRE Y COLOREO, tambien pasa datos a los labels
+// CREA LAS ANIMACIONES DE MOUSE Y COLOREO, tambien pasa datos a los labels
 const createHoverEffect = () => {
 
     globe
@@ -145,6 +158,7 @@ const createHoverEffect = () => {
         });
 };
 
+// CREA LAS ANIMACIONES DE ARRASTRE Y COLOREO, tambien pasa datos a los labels
 const createDraggingEvents = () => {
 
     globe
@@ -168,6 +182,7 @@ const createDraggingEvents = () => {
         })
 };
 
+// CREA EVENTOS PARA PODER SELECCIONAR PAISES
 const createSelectionEvent = () => {
 
     globe
@@ -187,7 +202,6 @@ const createSelectionEvent = () => {
             }
         })
 };
-
 const saveCountries = (d) => {
     const { name, type, economy, income_grp } = d.properties
     let tipos = `<ul><li class = "options ">${type}</li ><li class = "options ">${economy}</li><li class = "options ">${income_grp}</li></ul>`
