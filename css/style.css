@@ -39,6 +39,17 @@ svg {
   top: 500px;
 }
 
+.aeropuertos{
+  fill: white;
+  stroke-width: 0.50;
+  opacity: 0.65;
+}
+.rutas{
+  stroke-width: 1;
+  stroke: rgb(140, 8, 94);
+  opacity: 0.1;
+}
+
 .selected {
   fill: crimson !important;
   stroke: blueviolet !important;
