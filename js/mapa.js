@@ -10,10 +10,10 @@ const globeSize = {
 }
 
 let globe, projection, path, graticule;
-let geojson, airportjson, routesjson,linksjson;
+let geojson, airportjson, routesjson, linksjson;
 let origin, infoPanel, destiny;
 
-let nodes, links = [] ;
+let nodes, links = [];
 
 let choice = false;
 let activateList = false;
@@ -26,11 +26,11 @@ const routesURL = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main
 const linksURL = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/links.json'
 
 
-var promises = [json(worldURL), json(airportsURL), json(routesURL),json(linksURL)]
+var promises = [json(worldURL), json(airportsURL), json(routesURL), json(linksURL)]
 myDataPromises = Promise.all(promises)
 
 myDataPromises.then(function (data) {
-    init(data[0],data[1],data[2],data[3]);
+    init(data[0], data[1], data[2], data[3]);
 })
 myDataPromises.catch(function () {
     console.log('Something has gone wrong. No load Data.')
@@ -42,7 +42,7 @@ myDataPromises.catch(function () {
 
 
 
-const init = (worlds, airports, routes,coords) => {
+const init = (worlds, airports, routes, coords) => {
     geojson = worlds
     airportjson = airports
     routesjson = routes
@@ -50,7 +50,8 @@ const init = (worlds, airports, routes,coords) => {
     drawGlobe();
     // routesjson.forEach(function (row) {
     //     console.lo
-    drawRoutes();
+    // drawRoutes();
+    drawNodes()
     // drawGraticule()
     renderInfo();
     createHoverEffect()
@@ -84,19 +85,20 @@ const drawGlobe = () => {
 
 
 const drawNodes = () => {
-
+    nodes = globe.selectAll('g')
+        .data(airportjson)
+        .join('g')
+        .append('g')
+        
+        .attr('class', 'airport')
+        .attr('transform', ({ lon, lat }) => `translate(${projection([lon, lat]).join(",")})`)
+        .append("circle")
+        .attr('r', 1.5)
 }
 const drawRoutes = () => {
-    routesjson.forEach(function (row) {
-        source = [+row.origin_lon, + row.origin_la]
-        target = [+row.destination_lon, +row.destination_la]
-        topush = { type: "LineString", coordinates: [source, target] }
-        links.push(topush)
-    })
-    links.push(linksjson)
-    // Add the path
+
     globe.selectAll("myPath")
-        .data(links)
+        .data(linksjson)
         .enter()
         .append("path")
         .attr("class", "rutas")
@@ -130,7 +132,6 @@ const createHoverEffect = () => {
             infoPanel.html(`<h2>${name}</h2><hr>`)
             globe.selectAll('.country').classed('howerPass', false).classed('howerOff', true)
             select(this).classed('howerOff', false).classed("howerPass", true);
-            // globe.selectAll('.links').attr('display', 'flex');
         })
         .on("mouseout", function (e, d) {
             globe.selectAll('.country').classed("howerPass", false).classed('howerOff', true)
@@ -150,11 +151,12 @@ const createDraggingEvents = () => {
                 rotation.x += movementX / 2
                 rotation.y -= movementY / 2
 
-                
+
                 projection.rotate([rotation.x, rotation.y])
                 selectAll('.country').attr('d', path)
                 // selectAll('.graticule').attr('d', path(graticule()))
                 selectAll('.rutas').attr("d", function (d) { return path(d) })
+                selectAll('.airport').attr('transform', ({ lon, lat }) => `translate(${projection([lon, lat]).join(",")})`)
             }
         })
 };

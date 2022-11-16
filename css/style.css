@@ -43,6 +43,11 @@ svg {
   fill: none;
   stroke:#232323;
 }
+.airport{
+  fill: white;
+  position: relative;
+  opacity: 0.5;
+}
 .aeropuertos {
   fill: white;
   stroke-width: 0.50;
@@ -54,6 +59,7 @@ svg {
   stroke: gray;
   opacity: 0.85;
   fill: none;
+  /* display: none; */
 }
 
 .selected {
