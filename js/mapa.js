@@ -50,7 +50,7 @@ const init = (worlds, airports, routes, coords) => {
     drawGlobe();
     // routesjson.forEach(function (row) {
     //     console.lo
-    // drawRoutes();
+    drawRoutes();
     drawNodes()
     // drawGraticule()
     renderInfo();
