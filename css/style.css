@@ -8,46 +8,52 @@ body {
 }
 
 svg {
-  position: relative;
+  position: absolute;
 }
 
 #base {
   height: 100%;
   width: 100%;
+  font-size: small;
   display: flex;
+  margin: auto;
 }
 
 #data {
   color: white;
   padding: 30px;
 }
+
 #mapa {
-  
+  align-content: center;
   color: white;
   border-width: 3px;
   border-style: solid;
-  border-image: 
-    linear-gradient(
-      to bottom, 
-      purple, 
-      rgba(0,0,255,.1)
-    ) 1 100%;
+  border-image:
+    linear-gradient(to bottom,
+      purple,
+      rgba(0, 0, 255, .1)) 1 100%;
 }
 
 #selectAirport {
   left: 500px;
   top: 500px;
 }
-
-.aeropuertos{
+.graticule{
+  fill: none;
+  stroke:#232323;
+}
+.aeropuertos {
   fill: white;
   stroke-width: 0.50;
   opacity: 0.65;
 }
-.rutas{
-  stroke-width: 1;
-  stroke: rgb(140, 8, 94);
-  opacity: 0.1;
+
+.rutas {
+  stroke-width: 0.45;
+  stroke: gray;
+  opacity: 0.85;
+  fill: none;
 }
 
 .selected {
@@ -77,9 +83,11 @@ svg {
   stroke: #060a0f;
   transition: fill .5s;
 }
+
 .thisOption {
   color: green !important;
 }
-.options{
-  color : #6ea9ff;
+
+.options {
+  color: #6ea9ff;
 }

@@ -1,48 +1,58 @@
-const { json, select, selectAll, geoOrthographic, geoPath, geoGraticule, csv, geoMercator, set, easeElastic, transition, forceSimulation } = d3;
-
-var geojson, globe, projection, path, graticule, isMouseDown = false, rotation = { x: 0, y: 0 }, routescsv, routejson;
-
+const { json, select, selectAll, geoOrthographic, geoPath,
+    geoGraticule, csv, geoMercator, set, easeElastic,
+    transition, forceSimulation, forceLink, forceManyBody,
+    forceCenter } = d3;
 const width = document.querySelector("#mapa").clientWidth;
-const height = document.querySelector("#mapa").clientHeight - 25;
-
-let origin, infoPanel, destiny;
-let choice = false;
-
+const height = document.querySelector("#mapa").clientHeight - 10;
 const globeSize = {
     w: width * 0.90,
     h: height * 0.90,
 }
 
-const worldURI = 'https://raw.githubusercontent.com/LuisFelipePoma/D3-graph-gallery/master/DATA/world.geojson';
-const nodesURI = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/routes.json';
-const testURI = 'https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_connectionmap.csv';
+let globe, projection, path, graticule;
+let geojson, airportjson, routesjson,linksjson;
+let origin, infoPanel, destiny;
+
+let nodes, links = [] ;
+
+let choice = false;
+let activateList = false;
+let isMouseDown = false, rotation = { x: 0, y: 0 };
 
 
-var promises = [json(worldURI), json(nodesURI)]
+const worldURL = 'https://raw.githubusercontent.com/LuisFelipePoma/D3-graph-gallery/master/DATA/world.geojson';
+const airportsURL = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/airports.json';
+const routesURL = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/routes.json';
+const linksURL = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/links.json'
+
+
+var promises = [json(worldURL), json(airportsURL), json(routesURL),json(linksURL)]
 myDataPromises = Promise.all(promises)
 
 myDataPromises.then(function (data) {
-    init(data[0], data[1]);
+    init(data[0],data[1],data[2],data[3]);
 })
 myDataPromises.catch(function () {
-    console.log('Something has gone wrong. No load Data (csv,json)')
+    console.log('Something has gone wrong. No load Data.')
 })
 
 
-let activateList = false;
+
+//poner comentarios
 
 
 
-
-
-
-const init = (worlds, routes) => {
+const init = (worlds, airports, routes,coords) => {
     geojson = worlds
-    routejson = routes
-    drawGlobe()
-    drawNodes()
+    airportjson = airports
+    routesjson = routes
+    linksjson = coords
+    drawGlobe();
+    // routesjson.forEach(function (row) {
+    //     console.lo
+    drawRoutes();
     // drawGraticule()
-    renderInfo()
+    renderInfo();
     createHoverEffect()
     createSelectionEvent()
     createDraggingEvents()
@@ -54,15 +64,11 @@ const drawGlobe = () => {
         .append('svg')
         .attr('width', width)
         .attr('height', height)
-        .style("fill", "#DDDDDD")
-        .style("box-shadow", "0 6px 30px rgba(0, 0, 0, 0.356), 0 0 6px rgba(0, 0, 0, 0.05)")
-        .style("display", "block")
 
-    projection = geoMercator()
-        .scale(210)
-        .center([0, 20])
+    projection = geoOrthographic()
         .fitSize([globeSize.w, globeSize.h], geojson)
-        .translate([height - globeSize.w / 2, height / 2])
+        .translate([height - width / 2, height / 2])
+        .rotate([0, 0])
 
     path = geoPath().projection(projection)
 
@@ -73,7 +79,29 @@ const drawGlobe = () => {
         .attr('d', path)
         .attr('class', 'country noSelected selected howerOff howerPass')
         .classed('selected', false).classed('howerPass', false)
+
 };
+
+
+const drawNodes = () => {
+
+}
+const drawRoutes = () => {
+    routesjson.forEach(function (row) {
+        source = [+row.origin_lon, + row.origin_la]
+        target = [+row.destination_lon, +row.destination_la]
+        topush = { type: "LineString", coordinates: [source, target] }
+        links.push(topush)
+    })
+    links.push(linksjson)
+    // Add the path
+    globe.selectAll("myPath")
+        .data(links)
+        .enter()
+        .append("path")
+        .attr("class", "rutas")
+        .attr("d", function (d) { return path(d) })
+}
 
 const drawGraticule = () => {
 
@@ -83,9 +111,6 @@ const drawGraticule = () => {
         .append('path')
         .attr('class', 'graticule')
         .attr('d', path(graticule()))
-        .attr('fill', 'none')
-        .attr('stroke', '#232323')
-
 };
 
 // CREA ELEMENTOS(labels) PARA IMPRIMIR EN PANTALLA
@@ -105,7 +130,7 @@ const createHoverEffect = () => {
             infoPanel.html(`<h2>${name}</h2><hr>`)
             globe.selectAll('.country').classed('howerPass', false).classed('howerOff', true)
             select(this).classed('howerOff', false).classed("howerPass", true);
-            globe.selectAll('.links').attr('display', 'flex');
+            // globe.selectAll('.links').attr('display', 'flex');
         })
         .on("mouseout", function (e, d) {
             globe.selectAll('.country').classed("howerPass", false).classed('howerOff', true)
@@ -125,10 +150,11 @@ const createDraggingEvents = () => {
                 rotation.x += movementX / 2
                 rotation.y -= movementY / 2
 
+                
                 projection.rotate([rotation.x, rotation.y])
                 selectAll('.country').attr('d', path)
-                selectAll('.graticule').attr('d', path(graticule()))
-                selectAll('.circle').attr("d", function (d) { return path(d) })
+                // selectAll('.graticule').attr('d', path(graticule()))
+                selectAll('.rutas').attr("d", function (d) { return path(d) })
             }
         })
 };
