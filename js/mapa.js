@@ -21,14 +21,15 @@ let isMouseDown = false, rotation = { x: 0, y: 0 };
 
 
 const worldURL = 'https://raw.githubusercontent.com/LuisFelipePoma/D3-graph-gallery/master/DATA/world.geojson';
-const airportsURL = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/airports.json';
-const routesURL = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/routes.json';
-const linksURL = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/links.json'
+const airportsURL = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/datasets/V3/airports.json';
+const routesURL = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/datasets/V3/routes.json';
+const linksURL = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/datasets/V2/links.json'
 
 
 var promises = [json(worldURL), json(airportsURL), json(routesURL), json(linksURL)]
 myDataPromises = Promise.all(promises)
 
+//
 myDataPromises.then(function (data) {
     init(data[0], data[1], data[2], data[3]);
 })
@@ -48,10 +49,8 @@ const init = (worlds, airports, routes, coords) => {
     routesjson = routes
     linksjson = coords
     drawGlobe();
-    // routesjson.forEach(function (row) {
-    //     console.lo
     drawRoutes();
-    drawNodes()
+    drawNodes();
     // drawGraticule()
     renderInfo();
     createHoverEffect()
@@ -66,7 +65,7 @@ const drawGlobe = () => {
         .attr('width', width)
         .attr('height', height)
 
-    projection = geoOrthographic()
+    projection = geoMercator()
         .fitSize([globeSize.w, globeSize.h], geojson)
         .translate([height - width / 2, height / 2])
         .rotate([0, 0])
@@ -96,7 +95,15 @@ const drawNodes = () => {
         .attr('r', 1.5)
 }
 const drawRoutes = () => {
-
+    
+    // routesjson.forEach(function(row){
+    //   source = [+row.origin_lon, +row.origin_lat]
+    //   target = [+row.destination_lon, +row.destination_lat]
+    //   topush = {type: "LineString", coordinates: [source, target]}
+    //   links.push(topush)
+    // })
+    // console.log(routesjson)
+    // console.log(links)
     globe.selectAll("myPath")
         .data(linksjson)
         .enter()
