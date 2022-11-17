@@ -79,6 +79,7 @@ def paths(origen, destino):
     bestpath, _= dijkstra(G, origen)
     camino = []
     nodo = bestpath[destino]
+    camino.append(destino)
     while nodo != -1:
         camino.append(nodo)
         nodo = bestpath[nodo]

@@ -14,35 +14,35 @@ const globeSize = {
     h: height * 0.90,
 }
 // Variables necesarias para graficar en el svg el mapa
-let globe, projection, path, graticule;
+let globe, projection, path, graticule, nodes;
+
 
 // Varibales para las rutas y aeropuertos
-let nodes, links = [];
+let aristas;
+let airports;
 
 // Variables para guardar los dataSets
-let geojson, airportjson, routesjson, linksjson;
+let geojson, airportjson, routesjson;
 
 // Variables pára crear elementos en el HTML
 let infoPanel;
 
 // Variables para las animaciones
-// let choice = false;
-// let activateList = false;
+
 let isMouseDown = false, rotation = { x: 0, y: 0 };
 
 // Variables para guardar los links de las datasets
 const worldURL = 'https://raw.githubusercontent.com/LuisFelipePoma/D3-graph-gallery/master/DATA/world.geojson';
 const airportsURL = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/datasets/V3/airports.json';
 const routesURL = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/datasets/V3/routes.json';
-const linksURL = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/datasets/V2/links.json'
 
 // <------------------------------------------------------------------- Verificacion de la lectura de los datos ------------------------------------>//
 
 
-var promises = [json(worldURL), json(airportsURL), json(routesURL), json(linksURL)]
+var promises = [json(worldURL), json(airportsURL), json(routesURL)]
 myDataPromises = Promise.all(promises)
 myDataPromises.then(function (data) {
-    init(data[0], data[1], data[2], data[3]);
+    init(data[0], data[1], data[2]);
 })
 myDataPromises.catch(function () {
     console.log('Something has gone wrong. No load Data.')
@@ -51,70 +51,20 @@ myDataPromises.catch(function () {
 
 // <---------------------------------------------------------------- Funcion Init ---------------------------------------------------------------->//
 
-const init = (worlds, airports, routes, coords) => {
+const init = (worlds, airports, routes) => {
     geojson = worlds
     airportjson = airports
     routesjson = routes
-    linksjson = coords
+    getDataPath()
     drawGlobe();
     drawRoutes();
     drawNodes();
-    // drawGraticule()
+    drawGraticule()
     renderInfo();
     createHoverEffect()
-    // createSelectionEvent()
     createDraggingEvents()
-    getJsonRoutes()
 }
 // <------------------------------------------------------------------ Funciones ------------------------------------------------------------------>//
-
-// ----------> Funcion que obtiene y asigna valores de aeropuertos -- se activa del evento creado en (createSelectionEvent) 
-// const getAirports = (e, flag) => {
-//     let airportsData = selectAll(`.${e.id}`); // Se obtiene los aeropuertos respectivos del pais seleccionado
-//     let lista_aeropuertos = []; // Se almacenara informacion de los aeropuertos
-//     let SelectDir; // Direccion del elemento que obtendra la informacion de los aeropuertos
-
-//     // Se recorre el JSON seleccionado y se obtiene la lista de aeropuertos
-//     airportsData["_groups"][0].forEach(function (e) { lista_aeropuertos.push(e) })
-
-//     // Mediante este if verificamos a que form se agregara la informacion
-//     if (flag == false) SelectDir = "#listOrigenes";
-//     else SelectDir = "#listDestinos";
-
-//     // Mediante un forEach se recorrera la lista y se ira agregando los aeropuertos  
-//     lista_aeropuertos.forEach((e) => {
-//         let elementos = e["__data__"] // variable que tendra la data (city,country,id,)
-//         let contenido; // variable que obtendra los datos especificos del aeropuerto
-//         let opt = document.createElement("option"); // variable que sera el elemento a insertar en el HTML
-
-//         // Se le asigna el nombre del aeropuerto y la ciudad en la que se encuentra
-//         contenido = elementos.airport_name + " (" + elementos.city + " )";
-
-//         // Se le asigna al elemento sus atributos text(muestra en pantalla) y value(el valor del elemento)
-//         opt.text = contenido;
-//         opt.value = elementos.id;
-
-//         // Finalmente se inserta en el form que direccione "formDir" y se inserta esa opcion
-//         document.querySelector(SelectDir).appendChild(opt);
-//     })
-// }
-
-// ----------> Funcion que limpia las listas de Select -- es invocado en (createSelectionEvent)
-// function cleanLists() {
-//     // Se selecciona ambas listas Select y se limpia las opciones que existian
-//     document.querySelector("#listOrigenes").innerHTML = "";
-//     document.querySelector("#listDestinos").innerHTML = "";
-// }
-
-// ----------> Funcion que crea el evento de cargar data y asignarla -- es invocado en el HTML (input) 
-// function createLoadDataEvent() {
-//     let value_origin = document.querySelector("#listOrigenes").value; // Variable que almacenara el valor del aeropuerto origen (id)
-//     let value_destiny = document.querySelector("#listDestinos").value; // Variable que almacenara el valor del aeropuerto destino (id)
-
-//     // Mediante el Selector se asigna a los span correspondientes
-//     document.querySelector("#valueOrigin").textContent = value_origin;
-//     document.querySelector("#valueDestiny").textContent = value_destiny;
-// }
 
 // ----------> Funcion que genera las projecciones y svg para el mapa -- es invocado en init (main) 
 const drawGlobe = () => {
@@ -130,7 +80,6 @@ const drawGlobe = () => {
     projection = geoOrthographic()
         .fitSize([globeSize.w, globeSize.h], geojson)
         .translate([height - width / 2, height / 2])
-        .rotate([0, 0])
 
     // Se asigna al path la projeccion
     path = geoPath().projection(projection)
@@ -162,51 +111,53 @@ const drawGraticule = () => {
 // ----------> Funcion que genera los areopuertos(nodos) -- es invocado en init (main)
 const drawNodes = () => {
     nodes = globe.selectAll('g')
-        .data(airportjson)
+        .data(airports)
         .join('g')
         .append('g')
         .attr('class', (e) => { return `${e.country_code} airport` })
         .attr('transform', ({ lon, lat }) => `translate(${projection([lon, lat]).join(",")})`)
         .append("circle")
-        .attr('r', 2.5)
+        .attr('r', 10)
 }
 
 // ----------> Funcion que genera las rutas de los aeropuertos(aristas) -- es invocado en init (main)
-let aristas;
+const getDataPath = () => {
+    [aristas, airports] = getJsonRoutesNodes()
+    console.log(aristas)
+    console.log(airports)
+}
 
 const drawRoutes = () => {
     // Mediante un loop se lee el JSON y se generan las coordenadas y se pushea a una lista "aristas"
-    
-    aristas= getJsonRoutes()
+
+
     //Se asignan los valores determinados y clases
     globe.selectAll("myPath")
-    .data(aristas)
-    .enter()
-    .append("path")
-    .attr("class", "rutas")
-    .attr("d", function (d) { return path(d) })
+        .data(aristas)
+        .enter()
+        .append("path")
+        .attr("class", "rutas")
+        .attr("d", function (d) { return path(d) })
 }
 
-let caminos = document.querySelector("#rutas").textContent
-function getJsonRoutes(){
-    let jason = JSON.parse(caminos)
-    let aristas = jason["bestpath"];
+function getJsonRoutesNodes() {
+    let caminosElement = document.querySelector("#rutas").textContent;
+    let aristasString = JSON.parse(caminosElement);
+    let aristas = aristasString["bestpath"]
     let aeropuertos = airportjson;
     let rutas = []
-
     aristas = aristas.reverse()
     for (let i = 0; i < aristas.length; ++i) {
         let x = parseInt(aristas[i])
         let node = aeropuertos[x]
         rutas.push(node)
     }
-    console.log(rutas)
     let conexiones = []
     for (let i = 1; i < aristas.length; ++i) {
         let elemen = { type: "LineString", coordinates: [[+rutas[i - 1].lon, +rutas[i - 1].lat], [+rutas[i].lon, +rutas[i].lat]] }
         conexiones.push(elemen)
     }
-    return conexiones;
+    return [conexiones, rutas]
 }
 
 
@@ -249,34 +200,9 @@ const createDraggingEvents = () => {
 
                 projection.rotate([rotation.x, rotation.y])
                 selectAll('.country').attr('d', path)
-                // selectAll('.graticule').attr('d', path(graticule()))
+                selectAll('.graticule').attr('d', path(graticule()))
                 selectAll('.rutas').attr("d", function (d) { return path(d) })
                 selectAll('.airport').attr('transform', ({ lon, lat }) => `translate(${projection([lon, lat]).join(",")})`)
             }
         })
 };
-
-// ----------> Funcion que permite seleccionar el pais y generar animaciones y activa otros eventos -- es invocado en init (main)
-const createSelectionEvent = () => {
-
-    globe
-        .selectAll('.country')
-        .on('mousedown', function (e) {
-            const a = selectAll('.selected')
-            var b = "";
-            if (a.size() > 0) b = this.className.animVal
-            if (a.size() < 2 && b.search('selected') == -1) {
-                select(this).classed('noSelected', false);
-                select(this).classed('selected', true);
-                getAirports(this, choice);
-                choice = true;
-            }
-            if (b.search('selected') != -1) {
-                select(this).classed('selected', false);
-                select(this).classed('noSelected', true);
-                choice = false;
-                cleanLists();
-            }
-        })
-};
-

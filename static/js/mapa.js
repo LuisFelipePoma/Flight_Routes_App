@@ -17,10 +17,10 @@ const globeSize = {
 let globe, projection, path, graticule;
 
 // Varibales para las rutas y aeropuertos
-let nodes, links = [];
+let nodes;
 
 // Variables para guardar los dataSets
-let geojson, airportjson, routesjson, linksjson;
+let geojson, airportjson;
 
 // Variables pára crear elementos en el HTML
 let infoPanel;
@@ -33,16 +33,14 @@ let isMouseDown = false, rotation = { x: 0, y: 0 };
 // Variables para guardar los links de las datasets
 const worldURL = 'https://raw.githubusercontent.com/LuisFelipePoma/D3-graph-gallery/master/DATA/world.geojson';
 const airportsURL = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/datasets/V3/airports.json';
-const routesURL = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/datasets/V3/routes.json';
-const linksURL = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/datasets/V2/links.json'
 
 // <------------------------------------------------------------------- Verificacion de la lectura de los datos ------------------------------------>//
 
 
-var promises = [json(worldURL), json(airportsURL), json(routesURL), json(linksURL)]
+var promises = [json(worldURL), json(airportsURL)]
 myDataPromises = Promise.all(promises)
 myDataPromises.then(function (data) {
-    init(data[0], data[1], data[2], data[3]);
+    init(data[0], data[1]);
 })
 myDataPromises.catch(function () {
     console.log('Something has gone wrong. No load Data.')
@@ -51,16 +49,12 @@ myDataPromises.catch(function () {
 
 // <---------------------------------------------------------------- Funcion Init ---------------------------------------------------------------->//
 
-const init = (worlds, airports, routes, coords) => {
+const init = (worlds, airports, ) => {
     geojson = worlds
     airportjson = airports
-    routesjson = routes
-    linksjson = coords
-    console.log(airportjson)
     drawGlobe();
-    // drawRoutes();
     drawNodes();
-    // drawGraticule()
+    drawGraticule()
     renderInfo();
     createHoverEffect()
     createSelectionEvent()
@@ -168,27 +162,8 @@ const drawNodes = () => {
         .append('g')
         .attr('class', (e) => { return `${e.country_code} airport` })
         .attr('transform', ({ lon, lat }) => `translate(${projection([lon, lat]).join(",")})`)
-        .append("circle")
-        .attr('r', 2.5)
-}
-
-// ----------> Funcion que genera las rutas de los aeropuertos(aristas) -- es invocado en init (main)
-const drawRoutes = () => {
-    // Mediante un loop se lee el JSON y se generan las coordenadas y se pushea a una lista "aristas"
-    routesjson.forEach(function (row) {
-        source = [+row.origin_lon, +row.origin_lat]
-        target = [+row.destination_lon, +row.destination_lat]
-        topush = { type: "LineString", coordinates: [source, target] }
-        aristas.push(topush)
-    })
-
-    //Se asignan los valores determinados y clases
-    globe.selectAll("myPath")
-        .data(aristas)
-        .enter()
-        .append("path")
-        .attr("class", "rutas")
-        .attr("d", function (d) { return path(d) })
+        // .append("circle")
+        // .attr('r', 2.5)
 }
 
 // ----------> Funcion que se le asigna los objetos a las respectivas variables globales que se usara el otra funciones -- es invocado en init (main)
@@ -229,7 +204,7 @@ const createDraggingEvents = () => {
 
                 projection.rotate([rotation.x, rotation.y])
                 selectAll('.country').attr('d', path)
-                // selectAll('.graticule').attr('d', path(graticule()))
+                selectAll('.graticule').attr('d', path(graticule()))
                 selectAll('.rutas').attr("d", function (d) { return path(d) })
                 selectAll('.airport').attr('transform', ({ lon, lat }) => `translate(${projection([lon, lat]).join(",")})`)
             }
