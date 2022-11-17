@@ -1,5 +1,5 @@
 __pycache__
-Scripts
-Lib
+/Scripts/
+/Lib/
 .vscode
 /test/
