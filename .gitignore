@@ -1,4 +1,4 @@
 __pycache__
 Scripts
-Lib
+/Lib/*
 .vscode
