@@ -28,6 +28,7 @@ def aver():
         destino = int(destino)
         # return destino + " " + origen
         path = algorithm.paths(origen, destino)
+        
         # return app.send_static_file('/no/index3.html')
         return render_template(
             "routes.html", data={"path": path, "origen": origen, "destino": destino}

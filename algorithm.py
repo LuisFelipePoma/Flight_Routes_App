@@ -13,12 +13,12 @@ def transformGraph():
     rows = len(df)
     #columns = len(df.columns)
     G = [[] for _ in range(3241)]
-    id_origin = pd.Series(df._get_column_array(1))
-    id_destination = pd.Series(df._get_column_array(3))
-    origin_lat = pd.Series(df._get_column_array(6))
-    origin_lon = pd.Series(df._get_column_array(7))
-    destination_lat = pd.Series(df._get_column_array(9))
-    destination_lon = pd.Series(df._get_column_array(10))
+    id_origin = pd.Series(df._get_column_array(0))
+    id_destination = pd.Series(df._get_column_array(2))
+    origin_lat = pd.Series(df._get_column_array(5))
+    origin_lon = pd.Series(df._get_column_array(6))
+    destination_lat = pd.Series(df._get_column_array(8))
+    destination_lon = pd.Series(df._get_column_array(9))
 
     id_origin = id_origin.tolist()
     id_destination = id_destination.tolist()

@@ -57,7 +57,7 @@ const init = (worlds, airports, routes, coords) => {
     routesjson = routes
     linksjson = coords
     drawGlobe();
-    // drawRoutes();
+    drawRoutes();
     drawNodes();
     // drawGraticule()
     renderInfo();
@@ -67,28 +67,6 @@ const init = (worlds, airports, routes, coords) => {
     getJsonRoutes()
 }
 // <------------------------------------------------------------------ Funciones ------------------------------------------------------------------>//
-let caminos = document.querySelector("#rutas").textContent
-const getJsonRoutes = () => { 
-    let jason = JSON.parse(caminos)
-    let aristas = jason["bestpath"];
-    let aeropuertos = airportjson;
-    let rutas = []
-    for (let i = 0; i <aristas.length;++i)
-    {
-        let x = parseInt(aristas[i]) 
-        let node = aeropuertos[x]
-        rutas.push(node)
-    }
-    console.log(rutas[0].id)
-    routesjson.forEach(function (row) {
-        source = [+row.origin_lon, +row.origin_lat]
-        target = [+row.destination_lon, +row.destination_lat]
-        topush = { type: "LineString", coordinates: [source, target] }
-        aristas.push(topush)
-    })
-
-}
-
 
 // ----------> Funcion que obtiene y asigna valores de aeropuertos -- se activa del evento creado en (createSelectionEvent) 
 // const getAirports = (e, flag) => {
@@ -194,23 +172,44 @@ const drawNodes = () => {
 }
 
 // ----------> Funcion que genera las rutas de los aeropuertos(aristas) -- es invocado en init (main)
+let aristas;
+
 const drawRoutes = () => {
     // Mediante un loop se lee el JSON y se generan las coordenadas y se pushea a una lista "aristas"
-    routesjson.forEach(function (row) {
-        source = [+row.origin_lon, +row.origin_lat]
-        target = [+row.destination_lon, +row.destination_lat]
-        topush = { type: "LineString", coordinates: [source, target] }
-        aristas.push(topush)
-    })
-
+    
+    aristas= getJsonRoutes()
     //Se asignan los valores determinados y clases
     globe.selectAll("myPath")
-        .data(aristas)
-        .enter()
-        .append("path")
-        .attr("class", "rutas")
-        .attr("d", function (d) { return path(d) })
+    .data(aristas)
+    .enter()
+    .append("path")
+    .attr("class", "rutas")
+    .attr("d", function (d) { return path(d) })
 }
+
+let caminos = document.querySelector("#rutas").textContent
+function getJsonRoutes(){
+    let jason = JSON.parse(caminos)
+    let aristas = jason["bestpath"];
+    let aeropuertos = airportjson;
+    let rutas = []
+
+    aristas = aristas.reverse()
+    for (let i = 0; i < aristas.length; ++i) {
+        let x = parseInt(aristas[i])
+        let node = aeropuertos[x]
+        rutas.push(node)
+    }
+    console.log(rutas)
+    let conexiones = []
+    for (let i = 1; i < aristas.length; ++i) {
+        let elemen = { type: "LineString", coordinates: [[+rutas[i - 1].lon, +rutas[i - 1].lat], [+rutas[i].lon, +rutas[i].lat]] }
+        conexiones.push(elemen)
+    }
+    return conexiones;
+}
+
+
 
 // ----------> Funcion que se le asigna los objetos a las respectivas variables globales que se usara el otra funciones -- es invocado en init (main)
 const renderInfo = () => {
