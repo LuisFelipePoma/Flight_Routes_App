@@ -1,0 +1,99 @@
+body {
+  font-family: Helvetica, sans-serif;
+  background-color: #060016;
+  background-image: radial-gradient(ellipse farthest-corner at 45px 45px, #0c002a 0%, black 50%, #0c002a 95%);
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+}
+
+svg {
+  position: absolute;
+}
+
+#base {
+  height: 100%;
+  width: 100%;
+  font-size: small;
+  display: flex;
+  margin: auto;
+}
+
+#data {
+  color: white;
+  padding: 30px;
+}
+
+#mapa {
+  align-content: center;
+  color: white;
+  border-width: 3px;
+  border-style: solid;
+  border-image:
+    linear-gradient(to bottom,
+      purple,
+      rgba(0, 0, 255, .1)) 1 100%;
+}
+
+#selectAirport {
+  left: 500px;
+  top: 500px;
+}
+.graticule{
+  fill: none;
+  stroke:#232323;
+}
+.airport{
+  fill: white;
+  position: relative;
+  opacity: 0.5;
+}
+.aeropuertos {
+  fill: white;
+  stroke-width: 0.50;
+  opacity: 0.65;
+}
+
+.rutas {
+  stroke-width: 0.45;
+  stroke: gray;
+  opacity: 0.85;
+  fill: none;
+  /* display: none; */
+}
+
+.selected {
+  fill: crimson !important;
+  stroke: blueviolet !important;
+}
+
+.noSelected {
+  fill: #33415c;
+  stroke: #060a0f;
+}
+
+.country {
+  fill: #33415c;
+  stroke: #060a0f;
+  transition: fill .5s;
+}
+
+.howerPass {
+
+  fill: #6ea9ff;
+  stroke: white;
+}
+
+.howerOff {
+  fill: #33415c;
+  stroke: #060a0f;
+  transition: fill .5s;
+}
+
+.thisOption {
+  color: green !important;
+}
+
+.options {
+  color: #6ea9ff;
+}
