@@ -20,7 +20,7 @@ svg {
 }
 
 #data {
-  color: white;
+  color: rgba(255, 255, 255, 0.568);
   padding: 30px;
 }
 
@@ -110,7 +110,6 @@ svg {
   border-radius: 2px;
   box-shadow: 0 1px 0 1px rgba(0, 0, 0, .03);
 }
-
 /* ---------------------------------------------------------------- */
 .graticule {
   fill: none;
@@ -138,8 +137,8 @@ svg {
 }
 
 .selected {
-  fill: crimson !important;
-  stroke: blueviolet !important;
+  fill: rgba(220, 20, 60, 0.411) !important;
+  stroke: rgb(194, 63, 30) !important;
 }
 
 .noSelected {
@@ -160,7 +159,7 @@ svg {
 }
 
 .howerOff {
-  fill: #33415c;
+  fill: #3a64b8;
   stroke: #060a0f;
   transition: fill .5s;
 }
