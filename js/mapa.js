@@ -56,7 +56,7 @@ const init = (worlds, airports, routes, coords) => {
     routesjson = routes
     linksjson = coords
     drawGlobe();
-    drawRoutes();
+    // drawRoutes();
     drawNodes();
     // drawGraticule()
     renderInfo();
@@ -65,6 +65,30 @@ const init = (worlds, airports, routes, coords) => {
     createDraggingEvents()
 }
 // <------------------------------------------------------------------ Funciones ------------------------------------------------------------------>//
+// Obtener los datos de los aeropuertos del pais seleccionado
+const getAirports = (e) => {
+    // let airportsArray = []
+    addLi(e);
+}
+function addLi(e) {
+    var contenido;
+    var li = document.createElement("li");
+    var p = document.createElement("p");
+    let list = []
+    let airportsArray = selectAll(`.${e.id}`);
+    airportsArray["_groups"][0].forEach(function (e) { list.push(e) })
+    list.forEach((e) => {
+        var elementos = e["__data__"]
+        contenido = "Aeropuerto:" + elementos.airport_name + "\nCity: " + elementos.city;
+        p.appendChild(document.createTextNode(contenido));
+        document.querySelector("#lista_aeropuertos").appendChild(li).appendChild(p);
+    })
+}
+function cleanLists(){
+    document.querySelector("#lista_aeropuertos").innerHTML ="";
+}
+
+
 
 // DIBUJA MAPA 
 const drawGlobe = () => {
@@ -74,7 +98,7 @@ const drawGlobe = () => {
         .attr('width', width)
         .attr('height', height)
 
-    projection = geoMercator()
+    projection = geoOrthographic()
         .fitSize([globeSize.w, globeSize.h], geojson)
         .translate([height - width / 2, height / 2])
         .rotate([0, 0])
@@ -86,6 +110,7 @@ const drawGlobe = () => {
         .data(geojson.features)
         .enter().append('path')
         .attr('d', path)
+        .attr('id', (e) => { return e.id })
         .attr('class', 'country noSelected selected howerOff howerPass')
         .classed('selected', false).classed('howerPass', false)
 
@@ -108,8 +133,8 @@ const drawNodes = () => {
         .data(airportjson)
         .join('g')
         .append('g')
-        
-        .attr('class', 'airport')
+
+        .attr('class', (e) => { return `${e.country_code} airport` })
         .attr('transform', ({ lon, lat }) => `translate(${projection([lon, lat]).join(",")})`)
         .append("circle")
         .attr('r', 1.5)
@@ -117,12 +142,12 @@ const drawNodes = () => {
 
 //DIBUJA LAS RUTAS
 const drawRoutes = () => {
-    
-    routesjson.forEach(function(row){
-      source = [+row.origin_lon, +row.origin_lat]
-      target = [+row.destination_lon, +row.destination_lat]
-      topush = {type: "LineString", coordinates: [source, target]}
-      links.push(topush)
+
+    routesjson.forEach(function (row) {
+        source = [+row.origin_lon, +row.origin_lat]
+        target = [+row.destination_lon, +row.destination_lat]
+        topush = { type: "LineString", coordinates: [source, target] }
+        links.push(topush)
     })
     console.log(routesjson)
     console.log(links)
@@ -187,18 +212,20 @@ const createSelectionEvent = () => {
 
     globe
         .selectAll('.country')
-        .on('mousedown', function (e, d) {
+        .on('mousedown', function (e) {
             const a = selectAll('.selected')
             var b = "";
             if (a.size() > 0) b = this.className.animVal
             if (a.size() < 2 && b.search('selected') == -1) {
                 select(this).classed('noSelected', false);
                 select(this).classed('selected', true);
-                saveCountries(d);
+                getAirports(this);
+                // saveCountries(d);
             }
             if (b.search('selected') != -1) {
                 select(this).classed('selected', false);
                 select(this).classed('noSelected', true);
+                cleanLists()
             }
         })
 };
