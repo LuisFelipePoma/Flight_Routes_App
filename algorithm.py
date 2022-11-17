@@ -76,14 +76,19 @@ def dfs(G, s):
 G = transformGraph()
 
 def paths(origen, destino):
-    bestpath, _= dijkstra(G, origen)
-    camino = []
-    nodo = bestpath[destino]
-    camino.append(destino)
-    while nodo != -1:
-        camino.append(nodo)
-        nodo = bestpath[nodo]
+    route_with_dijkstra = []
+    route_with_dfs = []
+
+    bestpaths, _= dijkstra(G, origen)
+    dfspaths = dfs(G, origen)
+
+    node = bestpaths[destino]
+    route_with_dijkstra.append(destino)
+    
+    while node != -1:
+        route_with_dijkstra.append(node)
+        node = bestpaths[node]
     #path1= bfs(G, s)
     #path2= dfs(G, s)
-    #    return json.dumps({"bestpath": bestpath, "path1": path1, "path2": path2})
-    return json.dumps({"bestpath": camino})
+    #    return json.dumps({"bestpaths": bestpaths, "path1": path1, "path2": path2})
+    return json.dumps({"bestpaths": route_with_dijkstra})
