@@ -65,27 +65,35 @@ const init = (worlds, airports, routes, coords) => {
     createDraggingEvents()
 }
 // <------------------------------------------------------------------ Funciones ------------------------------------------------------------------>//
+
+
+// Creando un forms con los aeropuertos
 // Obtener los datos de los aeropuertos del pais seleccionado
-const getAirports = (e) => {
-    // let airportsArray = []
-    addLi(e);
-}
-function addLi(e) {
-    var contenido;
-    var li = document.createElement("li");
-    var p = document.createElement("p");
+const getAirports = (e,flag) => {
     let list = []
     let airportsArray = selectAll(`.${e.id}`);
+    let formDir; 
     airportsArray["_groups"][0].forEach(function (e) { list.push(e) })
+    console.log(list)
+    if (flag == false) formDir = "#listOrigenes";
+    else formDir = "#listDestinos";
+
     list.forEach((e) => {
         var elementos = e["__data__"]
-        contenido = "Aeropuerto:" + elementos.airport_name + "\nCity: " + elementos.city;
-        p.appendChild(document.createTextNode(contenido));
-        document.querySelector("#lista_aeropuertos").appendChild(li).appendChild(p);
+        var contenido;
+        var opt = document.createElement("option");
+
+        contenido = elementos.airport_name + " (" + elementos.city+" )";
+        opt.text = contenido;
+        opt.value = elementos.id_origin ;
+        console.log(opt.value)
+        document.querySelector(formDir).appendChild(opt);
     })
 }
-function cleanLists(){
-    document.querySelector("#lista_aeropuertos").innerHTML ="";
+
+function cleanLists() {
+    document.querySelector("#listOrigenes").innerHTML = "";
+    document.querySelector("#listDestinos").innerHTML = "";
 }
 
 
@@ -219,30 +227,32 @@ const createSelectionEvent = () => {
             if (a.size() < 2 && b.search('selected') == -1) {
                 select(this).classed('noSelected', false);
                 select(this).classed('selected', true);
-                getAirports(this);
+                getAirports(this, choice);
+                choice = true;
                 // saveCountries(d);
             }
             if (b.search('selected') != -1) {
                 select(this).classed('selected', false);
                 select(this).classed('noSelected', true);
-                cleanLists()
+                choice = false;
+                cleanLists();
             }
         })
 };
-const saveCountries = (d) => {
-    const { name, type, economy, income_grp } = d.properties
-    let tipos = `<ul><li class = "options ">${type}</li ><li class = "options ">${economy}</li><li class = "options ">${income_grp}</li></ul>`
-    if (choice == false) {
-        let dates = `<p>Origen : ${name}</p>`;
-        document.getElementById("origen").innerHTML = dates
-        document.getElementById("origen-list").innerHTML = tipos
-        choice = true;
-    }
-    else {
-        let dates = `<p>Destino : ${name}</p>`;
-        document.getElementById("destino").innerHTML = dates
-        document.getElementById("destino-list").innerHTML = tipos
-        choice = false;
-    }
-};
+// const saveCountries = (d) => {
+//     const { name, type, economy, income_grp } = d.properties
+//     let tipos = `<ul><li class = "options ">${type}</li ><li class = "options ">${economy}</li><li class = "options ">${income_grp}</li></ul>`
+//     if (choice == false) {
+//         let dates = `<p>Origen : ${name}</p>`;
+//         document.getElementById("origen").innerHTML = dates
+//         document.getElementById("origen-list").innerHTML = tipos
+//         choice = true;
+//     }
+//     else {
+//         let dates = `<p>Destino : ${name}</p>`;
+//         document.getElementById("destino").innerHTML = dates
+//         document.getElementById("destino-list").innerHTML = tipos
+//         choice = false;
+//     }
+// };
 

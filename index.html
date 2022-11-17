@@ -29,19 +29,39 @@
                 </div>
             </div>
             <div class="w-auto p-3">
-                <article id="origen"></article>
+                <!-- <article id="origen"></article>
                 <article id="origen-list">
                     <ul id="lista_aeropuertos">
 
                     </ul>
-                </article>
+                </article> -->
+                <form id="form_origen" name="form1" method="post" action="">
+                    <p>Eliga el Aeropuerto de Origen: </p><select name="airportO" id="listOrigenes"
+                        aria-placeholder="Seleccione Aeropuerto Origen" class="select-css">
+
+                    </select>
+                </form>
+
             </div>
             <div class="w-auto p-3">
-                <article id="destino"></article>
-                <article id="destino-list"></article>
+                <!-- <article id="destino"></article>
+                <article id="destino-list"></article> -->
+                <form id="form_destino" name="form2" method="post" action="">
+                    <p>Eliga el Aeropuerto de Destino: </p><select name="airportD" id="listDestinos"
+                        aria-placeholder="Seleccione Aeropuerto Destino" class="select-css">
+
+                    </select>
+                </form>
             </div>
             <div class="w-auto p-3">
-                <form><input type="submit"></form>
+                <form id="sendData" name="form3" method="post" action="">
+                    <input class="button" type="submit">
+                </form>
+
+            </div>
+            <div class="w-auto p-3">
+                <p id="valueOrigin">El ID DEL AEROPUERTO DE ORIGEN ES : </p>
+                <p id="valueDestiny">El ID DEL AEROPUERTO DE DESTINO ES : </p>
             </div>
         </div>
         <div class="col-6 h-100 d-inline-block" id="mapa" style="width: 50%; background-color: rgba(0,0,255,.1)"></div>
