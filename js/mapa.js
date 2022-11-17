@@ -63,18 +63,18 @@ const init = (worlds, airports, routes, coords) => {
     createHoverEffect()
     createSelectionEvent()
     createDraggingEvents()
+
 }
 // <------------------------------------------------------------------ Funciones ------------------------------------------------------------------>//
 
 
 // Creando un forms con los aeropuertos
 // Obtener los datos de los aeropuertos del pais seleccionado
-const getAirports = (e,flag) => {
+const getAirports = (e, flag) => {
     let list = []
     let airportsArray = selectAll(`.${e.id}`);
-    let formDir; 
+    let formDir;
     airportsArray["_groups"][0].forEach(function (e) { list.push(e) })
-    console.log(list)
     if (flag == false) formDir = "#listOrigenes";
     else formDir = "#listDestinos";
 
@@ -83,10 +83,9 @@ const getAirports = (e,flag) => {
         var contenido;
         var opt = document.createElement("option");
 
-        contenido = elementos.airport_name + " (" + elementos.city+" )";
+        contenido = elementos.airport_name + " (" + elementos.city + " )";
         opt.text = contenido;
-        opt.value = elementos.id_origin ;
-        console.log(opt.value)
+        opt.value = elementos.id_origin;
         document.querySelector(formDir).appendChild(opt);
     })
 }
@@ -95,7 +94,15 @@ function cleanLists() {
     document.querySelector("#listOrigenes").innerHTML = "";
     document.querySelector("#listDestinos").innerHTML = "";
 }
+function createLoadDataEvent() {
+    let value_origin = document.querySelector("#listOrigenes").value;
+    let value_destiny = document.querySelector("#listDestinos").value;
+   
 
+    document.querySelector("#valueOrigin").textContent = value_origin;
+    document.querySelector("#valueDestiny").textContent = value_destiny;
+
+}
 
 
 // DIBUJA MAPA 
@@ -106,7 +113,7 @@ const drawGlobe = () => {
         .attr('width', width)
         .attr('height', height)
 
-    projection = geoOrthographic()
+    projection = geoMercator()
         .fitSize([globeSize.w, globeSize.h], geojson)
         .translate([height - width / 2, height / 2])
         .rotate([0, 0])
@@ -157,8 +164,6 @@ const drawRoutes = () => {
         topush = { type: "LineString", coordinates: [source, target] }
         links.push(topush)
     })
-    console.log(routesjson)
-    console.log(links)
     globe.selectAll("myPath")
         .data(links)
         .enter()
@@ -216,6 +221,8 @@ const createDraggingEvents = () => {
 };
 
 // CREA EVENTOS PARA PODER SELECCIONAR PAISES
+
+
 const createSelectionEvent = () => {
 
     globe

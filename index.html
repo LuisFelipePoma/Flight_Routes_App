@@ -54,14 +54,18 @@
                 </form>
             </div>
             <div class="w-auto p-3">
-                <form id="sendData" name="form3" method="post" action="">
-                    <input class="button" type="submit">
-                </form>
-
+                <input class="button" type="submit" id="sendData" onclick="createLoadDataEvent()" >
             </div>
             <div class="w-auto p-3">
-                <p id="valueOrigin">El ID DEL AEROPUERTO DE ORIGEN ES : </p>
-                <p id="valueDestiny">El ID DEL AEROPUERTO DE DESTINO ES : </p>
+                <span>El ID DEL AEROPUERTO DE ORIGEN ES : </span>
+                <p id="valueOrigin">
+
+                </p>
+                <span>El ID DEL AEROPUERTO DE DESTINO ES : </span>
+
+                <p id="valueDestiny">
+                </p>
+
             </div>
         </div>
         <div class="col-6 h-100 d-inline-block" id="mapa" style="width: 50%; background-color: rgba(0,0,255,.1)"></div>

@@ -134,7 +134,7 @@ svg {
   stroke: gray;
   opacity: 0.85;
   fill: none;
-  display: none;
+  /* display: none; */
 }
 
 .selected {
