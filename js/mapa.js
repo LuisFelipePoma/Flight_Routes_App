@@ -55,6 +55,7 @@ const init = (worlds, airports, routes, coords) => {
     airportjson = airports
     routesjson = routes
     linksjson = coords
+    console.log(airportjson)
     drawGlobe();
     // drawRoutes();
     drawNodes();
@@ -70,22 +71,29 @@ const init = (worlds, airports, routes, coords) => {
 
 // Creando un forms con los aeropuertos
 // Obtener los datos de los aeropuertos del pais seleccionado
+
+// ----------> Funcion se activa del evento creado en (createSelectionEvent) 
 const getAirports = (e, flag) => {
-    let list = []
-    let airportsArray = selectAll(`.${e.id}`);
-    let formDir;
-    airportsArray["_groups"][0].forEach(function (e) { list.push(e) })
+    let airportsData = selectAll(`.${e.id}`); // Se obtiene los aeropuertos respectivos del pais seleccionado
+    let lista_aeropuertos = []; // Se almacenara informacion de los aeropuertos
+    let formDir; // Direccion del form que obtendra la informacion de los aeropuertos
+    
+    // Se recorre el JSON seleccionado y se obtiene la lista de aeropuertos
+    airportsData["_groups"][0].forEach(function (e) { lista_aeropuertos.push(e) })
+    
+    // Mediante este if verificamos a que form se agregara la informacion
     if (flag == false) formDir = "#listOrigenes";
     else formDir = "#listDestinos";
-
-    list.forEach((e) => {
-        var elementos = e["__data__"]
+    console.log(lista_aeropuertos)
+    // Mediante un forEach se recorrera la lista y se ira agregando los aeropuertos  
+    lista_aeropuertos.forEach((e) => {
+        var elementos = e["__data__"] // variable que tendra la data (city,country,id,)
         var contenido;
         var opt = document.createElement("option");
 
         contenido = elementos.airport_name + " (" + elementos.city + " )";
         opt.text = contenido;
-        opt.value = elementos.id_origin;
+        opt.value = elementos.id;
         document.querySelector(formDir).appendChild(opt);
     })
 }
