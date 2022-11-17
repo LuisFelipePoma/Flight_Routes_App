@@ -128,7 +128,7 @@ const drawGlobe = () => {
         .attr('height', height)
 
     // Se asigna a la projeccion las medidas acordes al div del cual pertenece
-    projection = geoMercator()
+    projection = geoOrthographic()
         .fitSize([globeSize.w, globeSize.h], geojson)
         .translate([height - width / 2, height / 2])
         .rotate([0, 0])
@@ -169,7 +169,7 @@ const drawNodes = () => {
         .attr('class', (e) => { return `${e.country_code} airport` })
         .attr('transform', ({ lon, lat }) => `translate(${projection([lon, lat]).join(",")})`)
         .append("circle")
-        .attr('r', 1.5)
+        .attr('r', 2.5)
 }
 
 // ----------> Funcion que genera las rutas de los aeropuertos(aristas) -- es invocado en init (main)
