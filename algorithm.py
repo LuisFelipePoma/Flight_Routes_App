@@ -58,12 +58,31 @@ def dijkstra(G, s):
 
     return path, cost
 
+def dfs(G, s):
+  n = len(G)
+  path = [-1]*n
+  visited = [False]*n
+
+  def _dfs(u):
+    visited[u] = True
+    for v, w in G[u]:
+      if not visited[v]:
+        path[v] = u
+        _dfs(v)
+
+  _dfs(s)
+  return path
+
 G = transformGraph()
 
-def paths(s, t):
-    bestpath, _= dijkstra(G, s)
-    print(bestpath)
+def paths(origen, destino):
+    bestpath, _= dijkstra(G, origen)
+    camino = []
+    nodo = bestpath[destino]
+    while nodo != -1:
+        camino.append(nodo)
+        nodo = bestpath[nodo]
     #path1= bfs(G, s)
-    #path2= dfs(G, s, t)
+    #path2= dfs(G, s)
     #    return json.dumps({"bestpath": bestpath, "path1": path1, "path2": path2})
-    return json.dumps({"bestpath": bestpath})
+    return json.dumps({"bestpath": camino})
