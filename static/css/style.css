@@ -1,3 +1,5 @@
+/* ------------------------  Elementos  ------------------------ */
+
 body {
   font-family: arial, helvetica, roboto, "new times roman", lato;
   background-image: linear-gradient(to right, #1F2223, #1F2223);
@@ -9,6 +11,8 @@ body {
 svg {
   position: absolute;
 }
+
+/* ------------------------  Id's  ------------------------ */
 
 #base {
   height: 100%;
@@ -40,8 +44,10 @@ svg {
   top: 500px;
 }
 
-/* ------------------------------------------------------------ */
+/* ------------------------  Clases  ------------------------ */
+
 /* Estilos para los Selects de Aeropuertos */
+
 .select-css {
   display: block;
   font-size: 16px;
@@ -89,7 +95,6 @@ svg {
   font-weight: normal;
 }
 
-/* ------------------------------------------------------------ */
 /* Estilos para el boton input */
 .button {
   position: block;
@@ -108,13 +113,19 @@ svg {
   box-shadow: 0 1px 0 1px rgba(0, 0, 0, .03);
 }
 
-/* ---------------------------------------------------------------- */
+/* Estilos para los elementos en el svg */
+
 .graticule {
   fill: none;
   stroke: #302f2f;
 }
+.country {
+  fill: #0C0E0F;
+  stroke: #b5bfcc;
+  transition: fill .5s;
+}
 
-
+/* Estilos para la animacion de pasar el mouse por el svg y seleccion de pais*/
 
 .selected {
   fill: rgba(220, 20, 60, 0.411) !important;

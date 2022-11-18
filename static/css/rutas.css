@@ -1,3 +1,5 @@
+/* ------------------------  Elementos  ------------------------ */
+
 body {
   font-family: arial, helvetica, roboto, "new times roman", lato;
   background-image: linear-gradient(to right, #1F2223, #1F2223);
@@ -9,6 +11,7 @@ body {
 svg {
   position: absolute;
 }
+/* ------------------------  Id's  ------------------------ */
 
 #base {
   height: 100%;
@@ -39,8 +42,10 @@ svg {
   display: none;
 }
 
-/* ------------------------------------------------------------ */
+/* ------------------------  Clases  ------------------------ */
+
 /* Estilos para el boton input */
+
 .button {
   position: block;
   max-width: 100%;
@@ -62,41 +67,50 @@ svg {
   box-shadow: 0 1px 0 1px rgba(0, 0, 0, .03);
 }
 
-/* ---------------------------------------------------------------- */
+/* Estilos generales para los aeropuertos y rutas */
+
+.airport {
+  fill: rgb(41, 58, 20);
+  position: relative;
+  opacity: 1;
+}
+
+.routes {
+  stroke-width: 5;
+  opacity: 0.65;
+}
+
+/* Estilos especificos para los aeropuertos y rutas */
+
+.node_origin {
+  fill: none;
+  fill: rgb(0, 26, 255) !important;
+}
+
+.node_destiny {
+  fill: rgb(11, 179, 165) !important;
+}
 
 .djk_routes {
-  stroke-width: 5;
-  stroke: rgb(0, 247, 255);
-  opacity: 0.65;
-  fill: none;
+  stroke: rgb(251, 255, 0);
 }
+
 .dfs_routes {
-  stroke-width: 5;
-  stroke: rgb(220, 235, 11);
-  opacity: 0.65;
-  fill: none;
+  stroke: rgb(255, 0, 0);
 }
+
 .prim_routes {
-  stroke-width: 5;
-  stroke: rgb(28, 185, 14);
-  opacity: 0.65;
-  fill: none;
+  stroke: rgb(21, 255, 0);
+
+
 }
+
+/* Estilos para los elementos en el svg */
+
+
 .graticule {
   fill: none;
   stroke: #232323;
-}
-
-.airport {
-  fill: rgb(211, 0, 0);
-  position: relative;
-  opacity: 0.75;
-}
-
-.aeropuertos {
-  fill: white;
-  stroke-width: 0.50;
-  opacity: 0.65;
 }
 
 .country {
@@ -105,6 +119,7 @@ svg {
   transition: fill .5s;
 }
 
+/* Estilos para la animacion de pasar el mouse por el svg */
 .howerPass {
 
   fill: #6ea9ff;

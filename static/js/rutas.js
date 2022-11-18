@@ -64,6 +64,7 @@ const init = (worldsData, airportsData, routesData) => {
     routesjson = routesData
     drawGlobe();
     drawGraticule();
+    generateGlobe
     getDataPath()
     renderInfoAlgo();
     createHoverEffect()
@@ -83,7 +84,7 @@ const createEventShow = () => {
         cleanAll();
         generateGlobe();
         updateNodes(djkNodes, "djk_nodes")
-        updateRoutes(djkRoutes, "prim_routes")
+        updateRoutes(djkRoutes, "djk_routes")
         createTextContent(djkNodes);
         console.log(globe)
     })
@@ -176,6 +177,11 @@ const updateNodes = (algorithmData, classT) => {
         .data(algorithmData)
         .enter().append('g')
         .attr('class', `${classT} airport`)
+        .attr('class',function (e,index){
+            if (index == 0) return `${classT} airport node_destiny`
+            else if (index == algorithmData.length - 1) return `${classT} airport node_origin`
+            else return `${classT} airport`
+        })
         .attr('transform', ({ lon, lat }) => `translate(${projection([lon, lat]).join(",")})`)
         .append("circle")
         .attr('r', 10)
@@ -188,31 +194,10 @@ const updateRoutes = (algorithmData, classT) => {
         .data(algorithmData)
         .enter()
         .append("path")
-        .attr("class", `${classT} rutas`)
+        .attr("class", `${classT} routes`)
         .attr("d", function (d) { return path(d) })
 }
-// V2
-const drawNode = () => {
 
-    nodesDJK = globe.selectAll('g')
-        .data(djkNodes)
-        .join('g')
-        .append('g')
-        .attr('id', "line")
-        .attr('class', 'djk_nodes airport')
-        .attr('transform', ({ lon, lat }) => `translate(${projection([lon, lat]).join(",")})`)
-        .append("circle")
-        .attr('r', 10)
-}
-const drawLinks = () => {
-    //Se asignan los valores determinados y clases
-    globe.selectAll("myPath")
-        .data(djkRoutes)
-        .enter()
-        .append("path")
-        .attr("class", 'djk_routes rutas')
-        .attr("d", function (d) { return path(d) })
-}
 
 // ----------> Funcion que obtiene la data de la API y la convierte en informacion -- es invocado en init (main)
 const getDataPath = () => {
