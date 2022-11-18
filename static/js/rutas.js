@@ -66,6 +66,8 @@ const init = (worlds, airports, routes) => {
 }
 // <------------------------------------------------------------------ Funciones ------------------------------------------------------------------>//
 
+
+
 // ----------> Funcion que genera las projecciones y svg para el mapa -- es invocado en init (main) 
 const drawGlobe = () => {
     // Se hace uso de las variables globales previamente creadas
@@ -138,7 +140,7 @@ const drawRoutes = () => {
 }
 
 // ----------> Funcion convierte la data obtenida en JSON -- es invocado en (getDataPath)
-function getJsonRoutesNodes() {
+const getJsonRoutesNodes = () => {
     let caminosElement = document.querySelector("#rutas").textContent;
     let aristasString = JSON.parse(caminosElement);
     let aristas = aristasString["bestpaths"]
