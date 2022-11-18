@@ -4,7 +4,15 @@
   font-family: 'Montserrat',monospace;;
 }
 body {
-  background-image: linear-gradient(to right, #1F2223, #1F2223);
+  background: -moz-radial-gradient(ellipse at 50% 50%, rgba(30, 7, 63, 1) 0%, rgba(0, 0, 0, 1) 90%, rgba(15, 6, 23, 1) 100%);
+
+  background: -webkit-radial-gradient(ellipse at 50% 50%, rgba(30, 7, 63, 1) 0%, rgba(0, 0, 0, 1) 90%, rgba(15, 6, 23, 1) 100%);
+
+  background: -o-radial-gradient(ellipse at 50% 50%, rgba(30, 7, 63, 1) 0%, rgba(0, 0, 0, 1) 90%, rgba(15, 6, 23, 1) 100%);
+
+  background: -ms-radial-gradient(ellipse at 50% 50%, rgba(30, 7, 63, 1) 0%, rgba(0, 0, 0, 1) 90%, rgba(15, 6, 23, 1) 100%);
+
+  background: radial-gradient(ellipse at 50% 50%, rgba(30, 7, 63, 1) 0%, rgba(0, 0, 0, 1) 90%, rgba(15, 6, 23, 1) 100%);
   margin: 0;
   padding: 0;
   height: 100vh;
@@ -29,15 +37,9 @@ svg {
 }
 
 #mapa {
-  background-color: #DDDDDD;
   align-content: center;
   color: white;
-  border-width: 3px;
-  border-style: solid;
-  border-image:
-    linear-gradient(to bottom,
-      rgb(0, 13, 128),
-      rgba(0, 0, 255, .1)) 1 100%;
+  
 }
 
 #selectAirport {
@@ -142,19 +144,20 @@ svg {
 }
 
 .country {
-  fill: #0C0E0F;
-  stroke: #b5bfcc;
+  fill: #968c9b;
+  stroke: #060a0f;
   transition: fill .5s;
 }
 
+/* Estilos para la animacion de pasar el mouse por el svg */
 .howerPass {
 
   fill: #6ea9ff;
-  stroke: white;
+  stroke: rgb(109, 107, 107);
 }
 
 .howerOff {
-  fill: #0C0E0F;
-  stroke: #b5bfcc;
+  fill: #968c9b;
+  stroke: #060a0f;
   transition: fill .5s;
 }

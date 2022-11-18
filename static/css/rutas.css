@@ -1,12 +1,20 @@
-
 /* ------------------------  Elementos  ------------------------ */
 
-*{
+* {
   font-family: 'Montserrat', monospace;
 }
 
 body {
-  background-image: linear-gradient(to right, #1F2223, #1F2223);
+  background: -moz-radial-gradient(ellipse at 50% 50%, rgba(30, 7, 63, 1) 0%, rgba(0, 0, 0, 1) 90%, rgba(15, 6, 23, 1) 100%);
+
+  background: -webkit-radial-gradient(ellipse at 50% 50%, rgba(30, 7, 63, 1) 0%, rgba(0, 0, 0, 1) 90%, rgba(15, 6, 23, 1) 100%);
+
+  background: -o-radial-gradient(ellipse at 50% 50%, rgba(30, 7, 63, 1) 0%, rgba(0, 0, 0, 1) 90%, rgba(15, 6, 23, 1) 100%);
+
+  background: -ms-radial-gradient(ellipse at 50% 50%, rgba(30, 7, 63, 1) 0%, rgba(0, 0, 0, 1) 90%, rgba(15, 6, 23, 1) 100%);
+
+  background: radial-gradient(ellipse at 50% 50%, rgba(30, 7, 63, 1) 0%, rgba(0, 0, 0, 1) 90%, rgba(15, 6, 23, 1) 100%);
+
   margin: 0;
   padding: 0;
   height: 100vh;
@@ -32,15 +40,17 @@ svg {
 }
 
 #mapa {
-  background-color: #4582bb;
+  /* background-color: #060016; */
+  /* background-image: radial-gradient(ellipse farthest-corner at 45px 45px, #12013b 0%, black 50%, #0c002a 95%); */
+
   align-content: center;
   color: white;
-  border-width: 3px;
+  /* border-width: 3px;
   border-style: solid;
   border-image:
     linear-gradient(to bottom,
       rgb(0, 13, 128),
-      rgba(0, 0, 255, .1)) 1 100%;
+      rgba(0, 0, 255, .1)) 1 100%; */
 }
 
 #origin_legend {
@@ -193,9 +203,9 @@ svg {
 /* Estilos generales para los aeropuertos y rutas */
 
 .airport {
-  fill: rgb(224, 214, 214);
+  fill: rgb(255, 255, 255);
   position: relative;
-  opacity: 0.85;
+  opacity: 0.88;
 }
 
 .routes {
@@ -235,8 +245,8 @@ svg {
 }
 
 .country {
-  fill: #0C0E0F;
-  stroke: rgb(109, 107, 107);
+  fill: #968c9b;
+  stroke: #060a0f;
   transition: fill .5s;
 }
 
@@ -248,7 +258,7 @@ svg {
 }
 
 .howerOff {
-  fill: #0C0E0F;
-  stroke: rgb(109, 107, 107);
+  fill: #968c9b;
+  stroke: #060a0f;
   transition: fill .5s;
 }
