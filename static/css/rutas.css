@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css?family=Barrio|Montserrat:700');
 /* ------------------------  Elementos  ------------------------ */
 
 body {
@@ -11,6 +12,7 @@ body {
 svg {
   position: absolute;
 }
+
 /* ------------------------  Id's  ------------------------ */
 
 #base {
@@ -47,25 +49,69 @@ svg {
 /* Estilos para el boton input */
 
 .button {
-  position: block;
-  max-width: 100%;
-  line-height: 1.3;
-  font-weight: 400;
-  width: 400px;
-  font-size: 16px;
-  font-family: 'Verdana', sans-serif;
-  background-color: #69035c;
-  margin: 20px auto;
+  margin: auto;
+  padding: 1rem;
+  text-transform: uppercase;
+  color: #1F2223;
+  background-color: #D3D4D5;
   border: none;
-  color: white;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  border-radius: 2px;
-  box-shadow: 0 1px 0 1px rgba(0, 0, 0, .03);
+  border-radius: 3px;
+  box-shadow: 1px 1px 10px rgba(50, 50, 50, .4);
+  transition: .3s all ease;
+  letter-spacing: .1rem;
+  font-size: .85rem;
+  position: relative;
+  top: 0;
+  right: 0;
+  padding-left: 2.5rem;
 }
+
+.button:after,
+.button:before {
+  position: absolute;
+  font-family: 'Barrio', sans-serif;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: .3s all ease;
+}
+
+.button:before {
+  content: '_';
+  position: absolute;
+  left: 1.4rem;
+  top: .9rem;
+}
+
+.button:after {
+  content: '>';
+  position: absolute;
+  left: .8rem;
+  top: 1rem;
+}
+
+.button:hover {
+  box-shadow: 1px 1px 20px rgba(150, 150, 150, .2);
+  top: -.1rem;
+  right: -.1rem;
+  cursor: pointer;
+
+}
+
+.button:before {
+  content: '_';
+  position: absolute;
+  left: .8rem;
+  top: .7rem;
+  transform: translateY(-1px);
+}
+
+.button:after {
+  content: '>';
+  position: absolute;
+  left: 1.1rem;
+  top: 1rem;
+}
+
 
 /* Estilos generales para los aeropuertos y rutas */
 
