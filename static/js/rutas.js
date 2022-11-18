@@ -78,7 +78,7 @@ const generateGlobe = () => {
 }
 
 // ----------> Funcion que agrupa las funciones para reiniciar el globo 
-const updateGlove = () =>{
+const updateGlove = () => {
     drawGlobe();
     drawGraticule();
     renderInfoAlgo();
@@ -123,7 +123,7 @@ const createTextContent = (data) => {
     });
     if (flag == true) {
         element.textContent = "Este algoritmo recorre todos los aeropuertos del mundo hasta llegar a su destino. ";
-    } else element.textContent = content;
+    } else element.textContent = content + "Fin.";
     document.querySelector("#data_algorith").appendChild(element);
 }
 
@@ -183,7 +183,7 @@ const updateNodes = (algorithmData, classT) => {
         .data(algorithmData)
         .enter().append('g')
         .attr('class', `${classT} airport`)
-        .attr('class',function (e,index){
+        .attr('class', function (e, index) {
             if (index == 0) return `${classT} airport node_destiny`
             else if (index == algorithmData.length - 1) return `${classT} airport node_origin`
             else return `${classT} airport`
@@ -251,10 +251,11 @@ const getJsonRoutesNodes = (algorithm) => {
 // ----------> Funcion que se le asigna los objetos a las respectivas variables globales que se usara el otra funciones -- es invocado en init (main)
 const renderInfoAlgo = () => {
     infoPanel = select('#info') // "infoPanel" -- mostrara el pais que esta seleccionando
-
+    let contentOrigin = "<h4> Aeropuerto Origen:  " + djkNodes[0].airport_name + "  <span id='origin_legend'>■</span></h4>";
+    let contentDestiny = "<h4>Aeropuerto Destino:  " + djkNodes[djkNodes.length - 1].airport_name + "  <span id='destiny_legend'>■</span></h4>";
     // Renderizar los aeropuertos origen y destino
-    document.getElementById("origen_label").innerText = "Aeropuerto Origen:" + djkNodes[0].airport_name;
-    document.getElementById("destino_label").innerText = "Aeropuerto Destino: " + djkNodes[djkNodes.length - 1].airport_name;
+    document.getElementById("origen_label").innerHTML = contentOrigin;
+    document.getElementById("destino_label").innerHTML = contentDestiny;
 };
 
 // ----------> Funcion que crea la animacion de cuando se pasa el mouse por el mapa -- es invocado en init (main)

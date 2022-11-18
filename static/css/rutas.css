@@ -40,13 +40,22 @@ svg {
       rgba(0, 0, 255, .1)) 1 100%;
 }
 
+#origin_legend {
+  color: rgb(0, 18, 180);
+  align-content: flex-end;
+}
+
+#destiny_legend {
+  color: rgb(190, 7, 7);
+}
+
 #pathsString {
   display: none;
 }
 
 /* ------------------------  Clases  ------------------------ */
 
-/* Estilos para el boton input */
+/* Estilos para el boton Volver */
 
 .button {
   margin: auto;
@@ -116,25 +125,25 @@ svg {
 /* Estilos generales para los aeropuertos y rutas */
 
 .airport {
-  fill: rgb(41, 58, 20);
+  fill: rgb(255, 153, 0);
   position: relative;
-  opacity: 1;
+  opacity: 0.65;
 }
 
 .routes {
-  stroke-width: 5;
-  opacity: 0.65;
+  stroke-width: 3.5;
+  opacity: 0.50;
   fill: none;
 }
 
 /* Estilos especificos para los aeropuertos y rutas */
 
 .node_origin {
-  fill: rgb(0, 26, 255) !important;
+  fill: rgb(0, 18, 180) !important;
 }
 
 .node_destiny {
-  fill: rgb(11, 179, 165) !important;
+  fill: rgb(190, 7, 7) !important;
 }
 
 .djk_routes {
