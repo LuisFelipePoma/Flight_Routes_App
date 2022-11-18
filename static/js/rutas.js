@@ -119,7 +119,7 @@ const drawNodes = () => {
         .append("circle")
         .attr('r', 10)
 }
-// ----------> Funcion que obtiene la data de la API y la convierte en informacion
+// ----------> Funcion que obtiene la data de la API y la convierte en informacion -- es invocado en init (main)
 const getDataPath = () => {
     [aristas, airports] = getJsonRoutesNodes()
     console.log(aristas)
@@ -137,7 +137,7 @@ const drawRoutes = () => {
         .attr("d", function (d) { return path(d) })
 }
 
-// ----------> Funcion que genera las rutas de los aeropuertos(aristas) -- es invocado en init (main)
+// ----------> Funcion convierte la data obtenida en JSON -- es invocado en (getDataPath)
 function getJsonRoutesNodes() {
     let caminosElement = document.querySelector("#rutas").textContent;
     let aristasString = JSON.parse(caminosElement);
