@@ -27,7 +27,6 @@ let infoPanel;
 
 // Variables para las animaciones
 let choice = false;
-let activateList = false;
 let isMouseDown = false, rotation = { x: 0, y: 0 };
 
 // Variables para guardar los links de las datasets
@@ -53,7 +52,7 @@ const init = (worlds, airports, ) => {
     geojson = worlds;
     airportjson = airports;
     drawGlobe();
-    drawNodes();
+    createNodes();
     drawGraticule();
     renderInfo();
     createHoverEffect();
@@ -81,7 +80,7 @@ const getAirports = (e, flag) => {
     airportsData["_groups"][0].forEach(function (e) { lista_aeropuertos.push(e) })
 
     // Mediante este if verificamos a que form se agregara la informacion
-    if (flag == false) SelectDir = "#listOrigenes";
+    if (flag === false) SelectDir = "#listOrigenes";
     else SelectDir = "#listDestinos";
 
     // Mediante un forEach se recorrera la lista y se ira agregando los aeropuertos  
@@ -108,17 +107,6 @@ const cleanLists = () => {
     // Se selecciona ambas listas Select y se limpia las opciones que existian
     document.querySelector("#listOrigenes").innerHTML = "";
     document.querySelector("#listDestinos").innerHTML = "";
-}
-
-// ----------> Funcion que crea el evento de cargar data y asignarla -- es invocado en el HTML (input) 
-
-const createLoadDataEvent = () => {
-    let value_origin = document.querySelector("#listOrigenes").value; // Variable que almacenara el valor del aeropuerto origen (id)
-    let value_destiny = document.querySelector("#listDestinos").value; // Variable que almacenara el valor del aeropuerto destino (id)
-
-    // Mediante el Selector se asigna a los span correspondientes
-    document.querySelector("#valueOrigin").textContent = value_origin;
-    document.querySelector("#valueDestiny").textContent = value_destiny;
 }
 
 // ----------> Funcion que genera las projecciones y svg para el mapa -- es invocado en init (main) 
@@ -168,15 +156,14 @@ const drawGraticule = () => {
 
 // ----------> Funcion que genera los areopuertos(nodos) -- es invocado en init (main)
 
-const drawNodes = () => {
+const createNodes = () => {
     nodes = globe.selectAll('g')
         .data(airportjson)
         .join('g')
         .append('g')
         .attr('class', (e) => { return `${e.country_code} airport` })
         .attr('transform', ({ lon, lat }) => `translate(${projection([lon, lat]).join(",")})`)
-        // .append("circle")
-        // .attr('r', 2.5)
+
 }
 
 // ----------> Funcion que se le asigna los objetos a las respectivas variables globales que se usara el otra funciones -- es invocado en init (main)
@@ -192,8 +179,8 @@ const createHoverEffect = () => {
     globe
         .selectAll('.country')
         .on('mouseover', function (e, d) {
-            const { name } = d.properties
-            infoPanel.html(`<h2>${name}</h2><hr>`)
+            const { name} = d.properties;
+            infoPanel.html(`<h2>Pais : ${name} - ${d.id}</h2><hr>`)
             globe.selectAll('.country').classed('howerPass', false).classed('howerOff', true)
             select(this).classed('howerOff', false).classed("howerPass", true);
         })
@@ -232,21 +219,24 @@ const createSelectionEvent = () => {
     globe
         .selectAll('.country')
         .on('mousedown', function (e) {
-            const a = selectAll('.selected')
-            var b = "";
+            let a = selectAll('.selected')
+            let b = "";
             if (a.size() > 0) b = this.className.animVal
             if (a.size() < 2 && b.search('selected') == -1) {
                 select(this).classed('noSelected', false);
                 select(this).classed('selected', true);
                 getAirports(this, choice);
                 choice = true;
+
             }
             if (b.search('selected') != -1) {
                 selectAll('.country').classed('selected', false);
                 selectAll('.country').classed('noSelected', true);
-                choice = false;
+                document.getElementById("sendData").disabled = true;
                 cleanLists();
+                choice = false;
             }
+            if (a.size() + 1 == 2) document.getElementById("sendData").disabled = false;
         })
 };
 
