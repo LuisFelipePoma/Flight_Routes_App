@@ -83,15 +83,14 @@ def paths(origen, destino):
     dfspaths = dfs(G, origen)
 
     node = bestpaths[destino]
-
+    node2 = dfspaths[destino]
     route_with_dijkstra.append(destino)
-
+    route_with_dfs.append(destino)
+    
     while node != -1:
         route_with_dijkstra.append(node)
         node = bestpaths[node]
     
-    node2 = dfspaths[destino]
-    route_with_dfs.append(destino)
     while node2 != -1:
         route_with_dfs.append(node2)
         node2 = dfspaths[node2]
