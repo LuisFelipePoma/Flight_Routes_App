@@ -95,6 +95,7 @@ def paths(origen, destino):
     while node2 != -1:
         route_with_dfs.append(node2)
         node2 = dfspaths[node2]
+        a = 1
         
     #    return json.dumps({"bestpaths": bestpaths, "path1": path1, "path2": path2})
     return json.dumps({"bestpaths": route_with_dijkstra, "dfs": route_with_dfs})
