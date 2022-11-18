@@ -95,14 +95,14 @@ const getAirports = (e, flag) => {
 }
 
 // ----------> Funcion que limpia las listas de Select -- es invocado en (createSelectionEvent)
-function cleanLists() {
+const cleanLists = () => {
     // Se selecciona ambas listas Select y se limpia las opciones que existian
     document.querySelector("#listOrigenes").innerHTML = "";
     document.querySelector("#listDestinos").innerHTML = "";
 }
 
 // ----------> Funcion que crea el evento de cargar data y asignarla -- es invocado en el HTML (input) 
-function createLoadDataEvent() {
+const createLoadDataEvent = () => {
     let value_origin = document.querySelector("#listOrigenes").value; // Variable que almacenara el valor del aeropuerto origen (id)
     let value_destiny = document.querySelector("#listDestinos").value; // Variable que almacenara el valor del aeropuerto destino (id)
 
