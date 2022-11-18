@@ -262,7 +262,6 @@ const renderInfoAlgo = () => {
     infoPanel = select('#info') // "infoPanel" -- mostrara el pais que esta seleccionando
 
     // Renderizar los aeropuertos origen y destino
-    // console.log(djkNodes[0])
     document.getElementById("origen_label").innerText = "Aeropuerto Origen:" + djkNodes[0].airport_name;
     document.getElementById("destino_label").innerText = "Aeropuerto Destino: " + djkNodes[djkNodes.length - 1].airport_name;
 };

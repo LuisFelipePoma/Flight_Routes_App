@@ -1,7 +1,6 @@
 body {
   font-family: arial, helvetica, roboto, "new times roman", lato;
-  background-color: #060016;
-  background-image: radial-gradient(ellipse farthest-corner at 45px 45px, #0c002a 0%, black 50%, #0c002a 95%);
+  background-image: linear-gradient(to right, #1F2223, #1F2223);
   margin: 0;
   padding: 0;
   height: 100vh;
@@ -25,13 +24,14 @@ svg {
 }
 
 #mapa {
+  background-color: #DDDDDD;
   align-content: center;
   color: white;
   border-width: 3px;
   border-style: solid;
   border-image:
     linear-gradient(to bottom,
-      purple,
+      rgb(0, 13, 128),
       rgba(0, 0, 255, .1)) 1 100%;
 }
 
@@ -99,16 +99,9 @@ svg {
   opacity: 0.65;
 }
 
-/* .rutas {
-    stroke-width: 5;
-    stroke: rgb(0, 247, 255);
-    opacity: 0.65;
-    fill: none;
-  } */
-
 .country {
-  fill: #33415c;
-  stroke: #060a0f;
+  fill: #0C0E0F;
+  stroke: #b5bfcc;
   transition: fill .5s;
 }
 
@@ -119,7 +112,7 @@ svg {
 }
 
 .howerOff {
-  fill: #4d4e50;
-  stroke: #060a0f;
+  fill: #0C0E0F;
+  stroke: #b5bfcc;
   transition: fill .5s;
 }

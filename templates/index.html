@@ -16,8 +16,8 @@
     crossorigin="anonymous"></script>
 
 <body>
-    <div id="base" style="height:100%;background-color: rgba(255,0,0,0.1);">
-        <div id="data" class="col-6 h-100 d-inline-block" style=" background-color: rgba(0,0,255,.1)">
+    <div id="base" style="height:100%">
+        <div id="data" class="col-6 h-100 d-inline-block">
             <div class="w-100 p-3">
                 <div>
                     <article>
@@ -42,26 +42,17 @@
                         class="select-css">
                     </select>
 
-                    <input type="submit" id="sendData" class="button">
+                    <div class="button row w-100">
+                        <div class="col v-center">
+                            <button class="btn btn-danger d-block mx-auto"> A regular button </button>
+                        </div>
+                    </div>
+
                 </form>
             </div>
-
-            <div class="w-auto p-3">
-                <input class="button" type="submit" id="sendData" onclick="createLoadDataEvent()">
-            </div>
-            <div class="w-auto p-3">
-                <span>El ID DEL AEROPUERTO DE ORIGEN ES : </span>
-                <p id="valueOrigin">
-
-                </p>
-                <span>El ID DEL AEROPUERTO DE DESTINO ES : </span>
-
-                <p id="valueDestiny">
-                </p>
-
-            </div>
         </div>
-        <div class="col-6 h-100 d-inline-block" id="mapa" style="width: 50%; background-color: rgba(0,0,255,.1)"></div>
+        <div class="col-6 h-100 d-inline-block" id="mapa" style="width: 50%">
+        </div>
     </div>
 
 </body>

@@ -242,8 +242,8 @@ const createSelectionEvent = () => {
                 choice = true;
             }
             if (b.search('selected') != -1) {
-                select(this).classed('selected', false);
-                select(this).classed('noSelected', true);
+                selectAll('.country').classed('selected', false);
+                selectAll('.country').classed('noSelected', true);
                 choice = false;
                 cleanLists();
             }
