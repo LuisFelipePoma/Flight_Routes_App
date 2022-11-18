@@ -78,12 +78,12 @@ svg {
 .routes {
   stroke-width: 5;
   opacity: 0.65;
+  fill: none;
 }
 
 /* Estilos especificos para los aeropuertos y rutas */
 
 .node_origin {
-  fill: none;
   fill: rgb(0, 26, 255) !important;
 }
 

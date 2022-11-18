@@ -62,9 +62,7 @@ const init = (worldsData, airportsData, routesData) => {
     geojson = worldsData
     airportjson = airportsData
     routesjson = routesData
-    drawGlobe();
-    drawGraticule();
-    generateGlobe
+    generateGlobe();
     getDataPath()
     renderInfoAlgo();
     createHoverEffect()
@@ -75,6 +73,10 @@ const init = (worldsData, airportsData, routesData) => {
 const generateGlobe = () => {
     drawGlobe();
     drawGraticule();
+}
+const updateGlove = () =>{
+    drawGlobe();
+    drawGraticule();
     renderInfoAlgo();
     createHoverEffect()
     createDraggingEvents()
@@ -82,7 +84,7 @@ const generateGlobe = () => {
 const createEventShow = () => {
     document.getElementById("showDjk").addEventListener("click", (e) => {
         cleanAll();
-        generateGlobe();
+        updateGlove();
         updateNodes(djkNodes, "djk_nodes")
         updateRoutes(djkRoutes, "djk_routes")
         createTextContent(djkNodes);
@@ -90,14 +92,14 @@ const createEventShow = () => {
     })
     document.getElementById("showDfs").addEventListener("click", (e) => {
         cleanAll();
-        generateGlobe();
+        updateGlove();
         updateNodes(dfsNodes, "dfs_nodes")
         updateRoutes(dfsRoutes, "dfs_routes")
         createTextContent(dfsNodes);
     })
     document.getElementById("showPrim").addEventListener("click", (e) => {
         cleanAll();
-        generateGlobe();
+        updateGlove();
         updateNodes(primNodes, "prim_nodes")
         updateRoutes(primRoutes, "prim_routes")
         createTextContent(primNodes);
@@ -284,7 +286,7 @@ const createDraggingEvents = () => {
                 projection.rotate([rotation.x, rotation.y])
                 selectAll('.country').attr('d', path)
                 selectAll('.graticule').attr('d', path(graticule()))
-                selectAll('.rutas').attr("d", function (d) { return path(d) })
+                selectAll('.routes').attr("d", function (d) { return path(d) })
                 selectAll('.airport').attr('transform', ({ lon, lat }) => `translate(${projection([lon, lat]).join(",")})`)
             }
         })
