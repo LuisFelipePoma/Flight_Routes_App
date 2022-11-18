@@ -73,20 +73,45 @@ def dfs(G, s):
   _dfs(s)
   return path
 
+def prim(G, s):
+    n = len(G)
+    visited = [False]*n
+    path = [-1]*n
+    cost = [math.inf]*n
+
+    cost[s] = 0
+    q = [(0, s)]
+    while q:
+        _, u = hq.heappop(q)
+        if visited[u]: continue
+        visited[u] = True
+        for v, w in G[u]:
+            if not visited[v] and w < cost[v]:
+                cost[v] = w
+                path[v] = u
+                hq.heappush(q, (w, v))
+
+    return path
+
 G = transformGraph()
 
 def paths(origen, destino):
     route_with_dijkstra = []
     route_with_dfs = []
+    route_with_prim = []
 
     bestpaths, _= dijkstra(G, origen)
     dfspaths = dfs(G, origen)
+    primpaths = prim(G, origen)
 
     node = bestpaths[destino]
     node2 = dfspaths[destino]
+    node3 = primpaths[destino]
+
     route_with_dijkstra.append(destino)
     route_with_dfs.append(destino)
-    
+    route_with_prim.append(destino)
+
     while node != -1:
         route_with_dijkstra.append(node)
         node = bestpaths[node]
@@ -94,6 +119,11 @@ def paths(origen, destino):
     while node2 != -1:
         route_with_dfs.append(node2)
         node2 = dfspaths[node2]
-        
+    
+    while node3 != -1:
+        route_with_prim.append(node3)
+        node3 = dfspaths[node3]
+    
+    print(route_with_prim)
     #    return json.dumps({"bestpaths": bestpaths, "path1": path1, "path2": path2})
-    return json.dumps({"bestpaths": route_with_dijkstra, "dfs": route_with_dfs})
+    return json.dumps({"djk": route_with_dijkstra, "dfs": route_with_dfs, "prim":route_with_prim})
