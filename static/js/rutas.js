@@ -55,8 +55,8 @@ const init = (worlds, airports, routes) => {
     geojson = worlds
     airportjson = airports
     routesjson = routes
-    getDataPath()
     drawGlobe();
+    getDataPath()
     drawRoutes();
     drawNodes();
     drawGraticule()
@@ -119,18 +119,15 @@ const drawNodes = () => {
         .append("circle")
         .attr('r', 10)
 }
-
-// ----------> Funcion que genera las rutas de los aeropuertos(aristas) -- es invocado en init (main)
+// ----------> Funcion que obtiene la data de la API y la convierte en informacion
 const getDataPath = () => {
     [aristas, airports] = getJsonRoutesNodes()
     console.log(aristas)
     console.log(airports)
 }
 
+// ----------> Funcion que genera las rutas de los aeropuertos(aristas) -- es invocado en init (main)
 const drawRoutes = () => {
-    // Mediante un loop se lee el JSON y se generan las coordenadas y se pushea a una lista "aristas"
-
-
     //Se asignan los valores determinados y clases
     globe.selectAll("myPath")
         .data(aristas)
@@ -140,17 +137,18 @@ const drawRoutes = () => {
         .attr("d", function (d) { return path(d) })
 }
 
+// ----------> Funcion que genera las rutas de los aeropuertos(aristas) -- es invocado en init (main)
 function getJsonRoutesNodes() {
     let caminosElement = document.querySelector("#rutas").textContent;
     let aristasString = JSON.parse(caminosElement);
-    let aristas = aristasString["bestpath"]
+    let aristas = aristasString["bestpaths"]
     let aeropuertos = airportjson;
-    let rutas = []
-    aristas = aristas.reverse()
+    let rutas = [];
+    aristas = aristas.reverse();
     for (let i = 0; i < aristas.length; ++i) {
-        let x = parseInt(aristas[i])
-        let node = aeropuertos[x]
-        rutas.push(node)
+        let x = parseInt(aristas[i]);
+        let node = aeropuertos[x];
+        rutas.push(node);
     }
     let conexiones = []
     for (let i = 1; i < aristas.length; ++i) {
@@ -159,8 +157,6 @@ function getJsonRoutesNodes() {
     }
     return [conexiones, rutas]
 }
-
-
 
 // ----------> Funcion que se le asigna los objetos a las respectivas variables globales que se usara el otra funciones -- es invocado en init (main)
 const renderInfo = () => {
@@ -196,7 +192,6 @@ const createDraggingEvents = () => {
 
                 rotation.x += movementX / 2
                 rotation.y -= movementY / 2
-
 
                 projection.rotate([rotation.x, rotation.y])
                 selectAll('.country').attr('d', path)
