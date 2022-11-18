@@ -83,12 +83,18 @@ def paths(origen, destino):
     dfspaths = dfs(G, origen)
 
     node = bestpaths[destino]
+
     route_with_dijkstra.append(destino)
-    
+
     while node != -1:
         route_with_dijkstra.append(node)
         node = bestpaths[node]
-    #path1= bfs(G, s)
-    #path2= dfs(G, s)
+    
+    node2 = dfspaths[destino]
+    route_with_dfs.append(destino)
+    while node2 != -1:
+        route_with_dfs.append(node2)
+        node2 = dfspaths[node2]
+        
     #    return json.dumps({"bestpaths": bestpaths, "path1": path1, "path2": path2})
-    return json.dumps({"bestpaths": route_with_dijkstra})
+    return json.dumps({"bestpaths": route_with_dijkstra, "dfs": route_with_dfs})
