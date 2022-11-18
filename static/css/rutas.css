@@ -53,7 +53,71 @@ svg {
   display: none;
 }
 
+#showDjk {
+  background-color: rgb(151, 0, 156);
+  color: #1F2223;
+}
+
+#showDfs {
+  background-color: rgb(255, 115, 0);
+  color: #1F2223;
+}
+
+#showPrim {
+  background-color: rgb(1, 201, 157);
+  color: #1F2223;
+}
+
+
 /* ------------------------  Clases  ------------------------ */
+/* Estilos para los botones */
+.buttons {
+  margin: auto;
+  padding: 1rem;
+  color: #1F2223;
+  background-color: #D3D4D5;
+  border: none;
+  border-radius: 3px;
+  box-shadow: 1px 1px 10px rgba(50, 50, 50, .4);
+  transition: .3s all ease;
+  letter-spacing: .1rem;
+  font-size: .85rem;
+  position: relative;
+  top: 0;
+  right: 0;
+  padding-left: 2.5rem;
+}
+
+.buttons:after,
+.buttons:before {
+  position: absolute;
+  font-family: 'Barrio', sans-serif;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: .3s all ease;
+}
+
+.buttons:before {
+  position: absolute;
+  left: 1.4rem;
+  top: .9rem;
+}
+
+.buttons:after {
+  position: absolute;
+  left: .8rem;
+  top: 1rem;
+}
+
+.buttons:hover {
+  box-shadow: 1px 1px 20px rgba(150, 150, 150, .2);
+  top: -.1rem;
+  right: -.1rem;
+  cursor: pointer;
+
+}
+
+
 
 /* Estilos para el boton Volver */
 
@@ -147,17 +211,15 @@ svg {
 }
 
 .djk_routes {
-  stroke: rgb(251, 255, 0);
+  stroke: rgb(151, 0, 156);
 }
 
 .dfs_routes {
-  stroke: rgb(255, 0, 0);
+  stroke: rgb(255, 115, 0);
 }
 
 .prim_routes {
-  stroke: rgb(21, 255, 0);
-
-
+  stroke: rgb(1, 201, 157);
 }
 
 /* Estilos para los elementos en el svg */

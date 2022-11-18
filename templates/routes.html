@@ -30,20 +30,25 @@
                 </div>
             </div>
             <div class="aeropuertos_title w-auto p-3">
-                <article id="origen_label"> </article><hr>
-                <article id="destino_label"></article><hr>
+                <article id="origen_label"> </article>
+                <hr>
+                <article id="destino_label"></article>
+                <hr>
             </div>
             <div class="w-auto p-3">
-                <h4>Ruta de Vuelos</h4>
+                <h4>Ruta de Vuelos : </h4>
+                <hr>
                 <article id="data_algorith"></article>
+                <hr>
             </div>
             <div class="w-auto p-3 btn-group col-md-8 text-center" role="group">
-                <button class="buttonShow btn btn-warning btn-lg" type="submit" id="showDjk" ">Ver Dijkstra</button>
-                <button class=" buttonShow btn btn-danger btn-lg" type="submit" id="showDfs" ">Ver DFS (Depth Find Path)</button>
-                <button class=" buttonShow btn btn-success btn-lg" type="submit" id="showPrim" ">Ver Prim</button>
+                <button class="buttons buttonShow btn  btn-lg" type="submit" id="showDjk">Ver Dijkstra</button>
+                <button class="buttons buttonShow btn  btn-lg" type="submit" id="showDfs">Ver DFS (Depth Find Path)</button>
+                <button class="buttons buttonShow btn  btn-lg" type="submit" id="showPrim">Ver Prim</button>
             </div>
             <div class=" w-auto p-3">
-                    <a class="button" type="submit" id="sendData" href="{{url_for('root')}}">Volver</a>
+                <hr>
+                <a class="button" type="submit" id="sendData" href="{{url_for('root')}}">Volver</a>
             </div>
         </div>
         <div class="col-6 h-100 d-inline-block" id="mapa" style="width: 50%"></div>
