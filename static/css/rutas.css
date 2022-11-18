@@ -1,8 +1,11 @@
-@import url('https://fonts.googleapis.com/css?family=Barrio|Montserrat:700');
+
 /* ------------------------  Elementos  ------------------------ */
 
+*{
+  font-family: 'Montserrat', monospace;
+}
+
 body {
-  font-family: arial, helvetica, roboto, "new times roman", lato;
   background-image: linear-gradient(to right, #1F2223, #1F2223);
   margin: 0;
   padding: 0;
@@ -29,7 +32,7 @@ svg {
 }
 
 #mapa {
-  background-color: #DDDDDD;
+  background-color: #4582bb;
   align-content: center;
   color: white;
   border-width: 3px;
@@ -54,20 +57,23 @@ svg {
 }
 
 #showDjk {
-  background-color: rgb(151, 0, 156);
+  background-color: rgb(196, 68, 201);
   color: #1F2223;
 }
 
 #showDfs {
-  background-color: rgb(255, 115, 0);
+  background-color: rgb(255, 196, 0);
   color: #1F2223;
 }
 
 #showPrim {
-  background-color: rgb(1, 201, 157);
+  background-color: rgb(135, 245, 71);
   color: #1F2223;
 }
 
+#dataAlgorith {
+  font-size: medium;
+}
 
 /* ------------------------  Clases  ------------------------ */
 /* Estilos para los botones */
@@ -91,7 +97,6 @@ svg {
 .buttons:after,
 .buttons:before {
   position: absolute;
-  font-family: 'Barrio', sans-serif;
   font-weight: bold;
   font-size: 1rem;
   transition: .3s all ease;
@@ -142,7 +147,6 @@ svg {
 .button:after,
 .button:before {
   position: absolute;
-  font-family: 'Barrio', sans-serif;
   font-weight: bold;
   font-size: 1rem;
   transition: .3s all ease;
@@ -189,37 +193,37 @@ svg {
 /* Estilos generales para los aeropuertos y rutas */
 
 .airport {
-  fill: rgb(255, 153, 0);
+  fill: rgb(224, 214, 214);
   position: relative;
-  opacity: 0.65;
+  opacity: 0.85;
 }
 
 .routes {
-  stroke-width: 3.5;
-  opacity: 0.50;
+  stroke-width: 3.85;
+  opacity: 0.85;
   fill: none;
 }
 
 /* Estilos especificos para los aeropuertos y rutas */
 
 .node_origin {
-  fill: rgb(0, 18, 180) !important;
+  fill: rgb(0, 17, 255) !important;
 }
 
 .node_destiny {
-  fill: rgb(190, 7, 7) !important;
+  fill: rgb(255, 0, 0) !important;
 }
 
 .djk_routes {
-  stroke: rgb(151, 0, 156);
+  stroke: rgb(196, 68, 201);
 }
 
 .dfs_routes {
-  stroke: rgb(255, 115, 0);
+  stroke: rgb(255, 196, 0);
 }
 
 .prim_routes {
-  stroke: rgb(1, 201, 157);
+  stroke: rgb(135, 245, 71);
 }
 
 /* Estilos para los elementos en el svg */
@@ -232,7 +236,7 @@ svg {
 
 .country {
   fill: #0C0E0F;
-  stroke: #b5bfcc;
+  stroke: rgb(109, 107, 107);
   transition: fill .5s;
 }
 
@@ -240,11 +244,11 @@ svg {
 .howerPass {
 
   fill: #6ea9ff;
-  stroke: white;
+  stroke: rgb(109, 107, 107);
 }
 
 .howerOff {
   fill: #0C0E0F;
-  stroke: #b5bfcc;
+  stroke: rgb(109, 107, 107);
   transition: fill .5s;
 }

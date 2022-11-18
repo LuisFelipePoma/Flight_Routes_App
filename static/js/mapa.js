@@ -62,13 +62,6 @@ const init = (worlds, airports, ) => {
 }
 // <------------------------------------------------------------------ Funciones ------------------------------------------------------------------>//
 
-
-// ----------> Funcion para crear los datos de los aeropuertos en pantalla
-
-const createTextContent = () => {
-
-}
-
 // ----------> Funcion que obtiene y asigna valores de aeropuertos -- se activa del evento creado en (createSelectionEvent) 
 
 const getAirports = (e, flag) => {

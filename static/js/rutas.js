@@ -184,13 +184,16 @@ const updateNodes = (algorithmData, classT) => {
         .enter().append('g')
         .attr('class', `${classT} airport`)
         .attr('class', function (e, index) {
-            if (index == 0) return `${classT} airport node_destiny`
-            else if (index == algorithmData.length - 1) return `${classT} airport node_origin`
+            if (index == 0) return `${classT} airport node_origin`
+            else if (index == algorithmData.length - 1) return `${classT} airport node_destiny`
             else return `${classT} airport`
         })
         .attr('transform', ({ lon, lat }) => `translate(${projection([lon, lat]).join(",")})`)
         .append("circle")
-        .attr('r', 10)
+        .attr('r', function (e, index) {
+            if (index == 0 || index == algorithmData.length - 1) return "7.5"
+            else return "5"
+        })
 }
 
 // ----------> Funcion que genera las rutas de los aeropuertos(aristas) -- es invocado en init (main)
