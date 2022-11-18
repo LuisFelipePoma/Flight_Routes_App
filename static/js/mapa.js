@@ -50,20 +50,28 @@ myDataPromises.catch(function () {
 // <---------------------------------------------------------------- Funcion Init ---------------------------------------------------------------->//
 
 const init = (worlds, airports, ) => {
-    geojson = worlds
-    airportjson = airports
+    geojson = worlds;
+    airportjson = airports;
     drawGlobe();
     drawNodes();
-    drawGraticule()
+    drawGraticule();
     renderInfo();
-    createHoverEffect()
-    createSelectionEvent()
-    createDraggingEvents()
+    createHoverEffect();
+    createSelectionEvent();
+    createDraggingEvents();
 
 }
 // <------------------------------------------------------------------ Funciones ------------------------------------------------------------------>//
 
+
+// ----------> Funcion para crear los datos de los aeropuertos en pantalla
+
+const createTextContent = () => {
+
+}
+
 // ----------> Funcion que obtiene y asigna valores de aeropuertos -- se activa del evento creado en (createSelectionEvent) 
+
 const getAirports = (e, flag) => {
     let airportsData = selectAll(`.${e.id}`); // Se obtiene los aeropuertos respectivos del pais seleccionado
     let lista_aeropuertos = []; // Se almacenara informacion de los aeropuertos
@@ -95,6 +103,7 @@ const getAirports = (e, flag) => {
 }
 
 // ----------> Funcion que limpia las listas de Select -- es invocado en (createSelectionEvent)
+
 const cleanLists = () => {
     // Se selecciona ambas listas Select y se limpia las opciones que existian
     document.querySelector("#listOrigenes").innerHTML = "";
@@ -102,6 +111,7 @@ const cleanLists = () => {
 }
 
 // ----------> Funcion que crea el evento de cargar data y asignarla -- es invocado en el HTML (input) 
+
 const createLoadDataEvent = () => {
     let value_origin = document.querySelector("#listOrigenes").value; // Variable que almacenara el valor del aeropuerto origen (id)
     let value_destiny = document.querySelector("#listDestinos").value; // Variable que almacenara el valor del aeropuerto destino (id)
@@ -112,6 +122,7 @@ const createLoadDataEvent = () => {
 }
 
 // ----------> Funcion que genera las projecciones y svg para el mapa -- es invocado en init (main) 
+
 const drawGlobe = () => {
     // Se hace uso de las variables globales previamente creadas
 
@@ -143,6 +154,7 @@ const drawGlobe = () => {
 };
 
 // ----------> Funcion que genera la reticula del mapa -- es invocado en init (main) 
+
 const drawGraticule = () => {
     // A la variable global se le asigna d3.geoGraticule
     graticule = geoGraticule()
@@ -155,6 +167,7 @@ const drawGraticule = () => {
 };
 
 // ----------> Funcion que genera los areopuertos(nodos) -- es invocado en init (main)
+
 const drawNodes = () => {
     nodes = globe.selectAll('g')
         .data(airportjson)
@@ -167,11 +180,13 @@ const drawNodes = () => {
 }
 
 // ----------> Funcion que se le asigna los objetos a las respectivas variables globales que se usara el otra funciones -- es invocado en init (main)
+
 const renderInfo = () => {
     infoPanel = select('#info') // "infoPanel" -- mostrara el pais que esta seleccionando
 };
 
 // ----------> Funcion que crea la animacion de cuando se pasa el mouse por el mapa -- es invocado en init (main)
+
 const createHoverEffect = () => {
 
     globe

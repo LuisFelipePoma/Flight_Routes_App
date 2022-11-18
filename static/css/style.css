@@ -1,5 +1,5 @@
 body {
-  font-family: Helvetica, sans-serif;
+  font-family: arial, helvetica, roboto, "new times roman", lato;
   background-color: #060016;
   background-image: radial-gradient(ellipse farthest-corner at 45px 45px, #0c002a 0%, black 50%, #0c002a 95%);
   margin: 0;

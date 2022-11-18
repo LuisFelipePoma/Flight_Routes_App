@@ -16,6 +16,7 @@
     crossorigin="anonymous"></script>
 
 <body>
+
     <div id="base" style="height:100%;background-color: rgba(255,0,0,0.1);">
         <div id="data" class="col-6 h-100 d-inline-block" style=" background-color: rgba(0,0,255,.1)">
             <div class="w-100 p-3">
@@ -28,23 +29,31 @@
                     <article id="info"></article>
                 </div>
             </div>
-            <div class="w-auto p-3"> 
-                    <p>Aeropuerto Origen: </p>
+            <div class="aeropuertos_title w-auto p-3">
+                <h4 id="origen_label">Aeropuerto Origen: </h4>
+                <h4 id="destino_label">Aeropuerto Destino: </h4>
             </div>
             <div class="w-auto p-3">
-            
-                    <p>Aeropuerto Destino: </p>
+                <h4>Ruta de Vuelos</h4>
+                <article id="data_algorith"></article>
             </div>
-            {%block paths %}
-                <p id = "rutas">{{data["path"]}}</p>
-            {%endblock%}
-            <div class="w-auto p-3">
-                <a class="button" type="submit" id="sendData" href="{{url_for('root')}}" >Volver</a>
+            <div class="w-auto p-3 btn-group col-md-8 text-center" role="group">
+                <button class="buttonShow btn btn-primary btn-lg" type="submit" id="showDjk" ">Ver Dijkstra</button>
+                <button class=" buttonShow btn btn-primary btn-lg" type="submit" id="showDfs" ">Ver DFS (Depth Find Path)</button>
+                <button class=" buttonShow btn btn-primary btn-lg" type="submit" id="showPrim" ">Ver Prim</button>
+            </div>
+            <div class=" w-auto p-3">
+                    <a class="button" type="submit" id="sendData" href="{{url_for('root')}}">Volver</a>
             </div>
         </div>
         <div class="col-6 h-100 d-inline-block" id="mapa" style="width: 50%; background-color: rgba(0,0,255,.1)"></div>
     </div>
 
+
+
+    {%block paths %}
+    <p id="pathsString">{{data["path"]}}</p>
+    {%endblock%}
 </body>
 <script src="{{ url_for('static',filename = 'js/rutas.js')}}"></script>
 

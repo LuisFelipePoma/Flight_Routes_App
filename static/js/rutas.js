@@ -2,9 +2,7 @@
 
 // Variables para manera la liberia D3.js
 const { json, select, selectAll, geoOrthographic, geoPath,
-    geoGraticule, csv, geoMercator, set, easeElastic,
-    transition, forceSimulation, forceLink, forceManyBody,
-    forceCenter } = d3;
+    geoGraticule, geoMercator, transition } = d3;
 
 // Variables para las medidas del navegador y del div donde estara el mapa
 const width = document.querySelector("#mapa").clientWidth;
@@ -14,16 +12,25 @@ const globeSize = {
     h: height * 0.90,
 }
 // Variables necesarias para graficar en el svg el mapa
-let globe, projection, path, graticule, nodes;
+let globe, projection, path, graticule;
 
+// Variables para guardar la data de la API
+let pathsAPI;
+// Variables para tener los datos resultantes de cada algoritmo
+let djkPath, dfsPath, primPath;
 
-// Varibales para las rutas y aeropuertos
-let aristas;
-let airports;
+// Variables para tener los aeropuertos del resultante de cada algoritmo (aeropuertos)
+let djkNodes, dfsNodes, primNodes;
+
+// Varibales para tener las rutas resultantes de cada algoritmo (aristas)
+let djkRoutes, dfsRoutes, primRoutes;
 
 // Variables para guardar los dataSets
 let geojson, airportjson, routesjson;
 
+// Variable para dibujar los nodos
+
+let nodes;
 // Variables pára crear elementos en el HTML
 let infoPanel;
 
@@ -51,22 +58,67 @@ myDataPromises.catch(function () {
 
 // <---------------------------------------------------------------- Funcion Init ---------------------------------------------------------------->//
 
-const init = (worlds, airports, routes) => {
-    geojson = worlds
-    airportjson = airports
-    routesjson = routes
+const init = (worldsData, airportsData, routesData) => {
+    geojson = worldsData
+    airportjson = airportsData
+    routesjson = routesData
     drawGlobe();
+    drawGraticule();
     getDataPath()
-    drawRoutes();
-    drawNodes();
-    drawGraticule()
-    renderInfo();
+    renderInfoAlgo();
+    createHoverEffect()
+    createDraggingEvents()
+    createEventShow();
+}
+// <------------------------------------------------------------------ Funciones ------------------------------------------------------------------>//
+const generateGlobe = () => {
+    drawGlobe();
+    drawGraticule();
+    renderInfoAlgo();
     createHoverEffect()
     createDraggingEvents()
 }
-// <------------------------------------------------------------------ Funciones ------------------------------------------------------------------>//
+const createEventShow = () => {
+    document.getElementById("showDjk").addEventListener("click", (e) => {
+        cleanAll();
+        generateGlobe();
+        updateNodes(djkNodes, "djk_nodes")
+        updateRoutes(djkRoutes, "prim_routes")
+        createTextContent(djkNodes);
+        console.log(globe)
+    })
+    document.getElementById("showDfs").addEventListener("click", (e) => {
+        cleanAll();
+        generateGlobe();
+        updateNodes(dfsNodes, "dfs_nodes")
+        updateRoutes(dfsRoutes, "dfs_routes")
+        createTextContent(dfsNodes);
+    })
+    document.getElementById("showPrim").addEventListener("click", (e) => {
+        cleanAll();
+        generateGlobe();
+        updateNodes(primNodes, "prim_nodes")
+        updateRoutes(primRoutes, "prim_routes")
+        createTextContent(primNodes);
+    })
+};
 
 
+// ----------> Funcion para crear los datos de los aeropuertos en pantalla
+
+const createTextContent = (data) => {
+    let element = document.createElement("p");
+    let content = ""
+    let flag = false;
+    data.forEach((e, index) => {
+        content += e.city + " (" + e.country_code + ")" + " -> ";
+        if (index > 125) { flag = true; return; }
+    });
+    if (flag == true) {
+        element.textContent = "Este algoritmo recorre todos los aeropuertos del mundo hasta llegar a su destino. ";
+    } else element.textContent = content;
+    document.querySelector("#data_algorith").appendChild(element);
+}
 
 // ----------> Funcion que genera las projecciones y svg para el mapa -- es invocado en init (main) 
 const drawGlobe = () => {
@@ -111,58 +163,108 @@ const drawGraticule = () => {
 };
 
 // ----------> Funcion que genera los areopuertos(nodos) -- es invocado en init (main)
-const drawNodes = () => {
+
+// V.1
+const cleanAll = () => {
+    globe.selectAll('g').remove();
+    var pathSet = globe.selectAll('path');
+    pathSet["_groups"][0].forEach((e) => { e.remove(); })
+    document.querySelector("#data_algorith").innerHTML = " ";
+}
+const updateNodes = (algorithmData, classT) => {
     nodes = globe.selectAll('g')
-        .data(airports)
-        .join('g')
-        .append('g')
-        .attr('class', (e) => { return `${e.country_code} airport` })
+        .data(algorithmData)
+        .enter().append('g')
+        .attr('class', `${classT} airport`)
         .attr('transform', ({ lon, lat }) => `translate(${projection([lon, lat]).join(",")})`)
         .append("circle")
         .attr('r', 10)
 }
-// ----------> Funcion que obtiene la data de la API y la convierte en informacion -- es invocado en init (main)
-const getDataPath = () => {
-    [aristas, airports] = getJsonRoutesNodes()
-    console.log(aristas)
-    console.log(airports)
-}
 
 // ----------> Funcion que genera las rutas de los aeropuertos(aristas) -- es invocado en init (main)
-const drawRoutes = () => {
+const updateRoutes = (algorithmData, classT) => {
     //Se asignan los valores determinados y clases
     globe.selectAll("myPath")
-        .data(aristas)
+        .data(algorithmData)
         .enter()
         .append("path")
-        .attr("class", "rutas")
+        .attr("class", `${classT} rutas`)
+        .attr("d", function (d) { return path(d) })
+}
+// V2
+const drawNode = () => {
+
+    nodesDJK = globe.selectAll('g')
+        .data(djkNodes)
+        .join('g')
+        .append('g')
+        .attr('id', "line")
+        .attr('class', 'djk_nodes airport')
+        .attr('transform', ({ lon, lat }) => `translate(${projection([lon, lat]).join(",")})`)
+        .append("circle")
+        .attr('r', 10)
+}
+const drawLinks = () => {
+    //Se asignan los valores determinados y clases
+    globe.selectAll("myPath")
+        .data(djkRoutes)
+        .enter()
+        .append("path")
+        .attr("class", 'djk_routes rutas')
         .attr("d", function (d) { return path(d) })
 }
 
+// ----------> Funcion que obtiene la data de la API y la convierte en informacion -- es invocado en init (main)
+const getDataPath = () => {
+    pathsAPI = document.querySelector("#pathsString").textContent;
+    getDataDjk();
+    getDataDfs();
+    getDataPrim();
+}
+// ----------> Funcion que obtienen la data de las rutas y aeropuertos
+const getDataDjk = () => {
+    [djkNodes, djkRoutes] = getJsonRoutesNodes("djk");
+}
+const getDataDfs = () => {
+    [dfsNodes, dfsRoutes] = getJsonRoutesNodes("dfs");
+}
+const getDataPrim = () => {
+    [primNodes, primRoutes] = getJsonRoutesNodes("prim");
+}
+
 // ----------> Funcion convierte la data obtenida en JSON -- es invocado en (getDataPath)
-const getJsonRoutesNodes = () => {
-    let caminosElement = document.querySelector("#rutas").textContent;
-    let aristasString = JSON.parse(caminosElement);
-    let aristas = aristasString["bestpaths"]
-    let aeropuertos = airportjson;
-    let rutas = [];
-    aristas = aristas.reverse();
-    for (let i = 0; i < aristas.length; ++i) {
-        let x = parseInt(aristas[i]);
-        let node = aeropuertos[x];
-        rutas.push(node);
+const getJsonRoutesNodes = (algorithm) => {
+    let pathsString = JSON.parse(pathsAPI);
+    let routesIds = pathsString[algorithm]
+    let airports = [];
+    console.log(algorithm)
+    console.log(routesIds)
+    routesIds = routesIds.reverse();
+
+    for (let i = 0; i < routesIds.length; ++i) {
+        let id = parseInt(routesIds[i]);
+        let data = airportjson[id];
+        airports.push(data);
     }
-    let conexiones = []
-    for (let i = 1; i < aristas.length; ++i) {
-        let elemen = { type: "LineString", coordinates: [[+rutas[i - 1].lon, +rutas[i - 1].lat], [+rutas[i].lon, +rutas[i].lat]] }
-        conexiones.push(elemen)
+    console.log(airports)
+    // Para hallar las coordenadas de las rutas a mostrar en pantalla
+    let routes = []
+
+    for (let i = 1; i < routesIds.length; ++i) {
+        let content = { type: "LineString", coordinates: [[+airports[i - 1].lon, +airports[i - 1].lat], [+airports[i].lon, +airports[i].lat]] }
+        routes.push(content)
     }
-    return [conexiones, rutas]
+    return [airports, routes]
 }
 
 // ----------> Funcion que se le asigna los objetos a las respectivas variables globales que se usara el otra funciones -- es invocado en init (main)
-const renderInfo = () => {
+const renderInfoAlgo = () => {
     infoPanel = select('#info') // "infoPanel" -- mostrara el pais que esta seleccionando
+
+    // Renderizar los aeropuertos origen y destino
+    // console.log(djkNodes[0])
+    document.getElementById("origen_label").innerText = "Aeropuerto Origen:" + djkNodes[0].airport_name;
+    document.getElementById("destino_label").innerText = "Aeropuerto Destino: " + djkNodes[djkNodes.length - 1].airport_name;
 };
 
 // ----------> Funcion que crea la animacion de cuando se pasa el mouse por el mapa -- es invocado en init (main)
