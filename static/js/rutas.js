@@ -70,10 +70,14 @@ const init = (worldsData, airportsData, routesData) => {
     createEventShow();
 }
 // <------------------------------------------------------------------ Funciones ------------------------------------------------------------------>//
+
+// ----------> Funcion que agrupa las funciones que generan el mapa
 const generateGlobe = () => {
     drawGlobe();
     drawGraticule();
 }
+
+// ----------> Funcion que agrupa las funciones para reiniciar el globo 
 const updateGlove = () =>{
     drawGlobe();
     drawGraticule();
@@ -81,6 +85,8 @@ const updateGlove = () =>{
     createHoverEffect()
     createDraggingEvents()
 }
+
+// ----------> Funcion que crea los eventos de los botones para mostrar las rutas y aeropuertos de cada algoritmo
 const createEventShow = () => {
     document.getElementById("showDjk").addEventListener("click", (e) => {
         cleanAll();
@@ -106,9 +112,7 @@ const createEventShow = () => {
     })
 };
 
-
 // ----------> Funcion para crear los datos de los aeropuertos en pantalla
-
 const createTextContent = (data) => {
     let element = document.createElement("p");
     let content = ""
@@ -165,15 +169,15 @@ const drawGraticule = () => {
         .attr('d', path(graticule()))
 };
 
-// ----------> Funcion que genera los areopuertos(nodos) -- es invocado en init (main)
-
-// V.1
+// ----------> Funcion que limpia las rutas y nodos en el svg (mapa) 
 const cleanAll = () => {
     globe.selectAll('g').remove();
     var pathSet = globe.selectAll('path');
     pathSet["_groups"][0].forEach((e) => { e.remove(); })
     document.querySelector("#data_algorith").innerHTML = " ";
 }
+
+// ----------> Funcion que genera los areopuertos(nodos) -- es invocado en init (main)
 const updateNodes = (algorithmData, classT) => {
     nodes = globe.selectAll('g')
         .data(algorithmData)
@@ -200,7 +204,6 @@ const updateRoutes = (algorithmData, classT) => {
         .attr("d", function (d) { return path(d) })
 }
 
-
 // ----------> Funcion que obtiene la data de la API y la convierte en informacion -- es invocado en init (main)
 const getDataPath = () => {
     pathsAPI = document.querySelector("#pathsString").textContent;
@@ -208,7 +211,8 @@ const getDataPath = () => {
     getDataDfs();
     getDataPrim();
 }
-// ----------> Funcion que obtienen la data de las rutas y aeropuertos
+
+// ----------> Funciones que obtienen la data de las rutas y aeropuertos de cada algoritmo (djk -> Dijkstra, dfs -> (Depth Find Search), prim -> (Prim)) 
 const getDataDjk = () => {
     [djkNodes, djkRoutes] = getJsonRoutesNodes("djk");
 }
