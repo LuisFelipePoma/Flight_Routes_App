@@ -95,6 +95,15 @@ def prim(G, s):
 
 G = transformGraph()
 
+def get_route(path, destino):
+    route = []
+    node = path[destino]
+    route.append(destino)
+    while node != -1:
+        route.append(node)
+        node = path[node]
+    return route
+
 def paths(origen, destino):
     route_with_dijkstra = []
     route_with_dfs = []
@@ -104,26 +113,8 @@ def paths(origen, destino):
     dfspaths = dfs(G, origen)
     primpaths = prim(G, origen)
 
-    node = bestpaths[destino]
-    node2 = dfspaths[destino]
-    node3 = primpaths[destino]
+    route_with_dijkstra = get_route(bestpaths, destino)
+    route_with_dfs = get_route(dfspaths, destino)
+    route_with_prim = get_route(primpaths, destino)
 
-    route_with_dijkstra.append(destino)
-    route_with_dfs.append(destino)
-    route_with_prim.append(destino)
-
-    while node != -1:
-        route_with_dijkstra.append(node)
-        node = bestpaths[node]
-    
-    while node2 != -1:
-        route_with_dfs.append(node2)
-        node2 = dfspaths[node2]
-    
-    while node3 != -1:
-        route_with_prim.append(node3)
-        node3 = dfspaths[node3]
-    
-    print(route_with_prim)
-    #    return json.dumps({"bestpaths": bestpaths, "path1": path1, "path2": path2})
     return json.dumps({"djk": route_with_dijkstra, "dfs": route_with_dfs, "prim":route_with_prim})
