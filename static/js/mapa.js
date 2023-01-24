@@ -1,10 +1,8 @@
 //<----------------------------------------------------------   Variables globales -------------------------------------------------------------------->//
 
-// Variables para manera la liberia D3.js
+// Variables para manejar la liberia D3.js
 const { json, select, selectAll, geoOrthographic, geoPath,
-    geoGraticule, csv, geoMercator, set, easeElastic,
-    transition, forceSimulation, forceLink, forceManyBody,
-    forceCenter } = d3;
+    geoGraticule, transition } = d3;
 
 // Variables para las medidas del navegador y del div donde estara el mapa
 const width = document.querySelector("#mapa").clientWidth;
@@ -48,7 +46,7 @@ myDataPromises.catch(function () {
 
 // <---------------------------------------------------------------- Funcion Init ---------------------------------------------------------------->//
 
-const init = (worlds, airports, ) => {
+const init = (worlds, airports,) => {
     geojson = worlds;
     airportjson = airports;
     drawGlobe();
@@ -172,7 +170,7 @@ const createHoverEffect = () => {
     globe
         .selectAll('.country')
         .on('mouseover', function (e, d) {
-            const { name} = d.properties;
+            const { name } = d.properties;
             infoPanel.html(`<h2>Pais : ${name} - ${d.id}</h2><hr>`)
             globe.selectAll('.country').classed('howerPass', false).classed('howerOff', true)
             select(this).classed('howerOff', false).classed("howerPass", true);

@@ -1,8 +1,8 @@
 //<----------------------------------------------------------   Variables globales -------------------------------------------------------------------->//
 
-// Variables para manera la liberia D3.js
+// Variables para manejar la liberia D3.js
 const { json, select, selectAll, geoOrthographic, geoPath,
-    geoGraticule, geoMercator, transition } = d3;
+    geoGraticule, geoMercator,transition } = d3;
 
 // Variables para las medidas del navegador y del div donde estara el mapa
 const width = document.querySelector("#mapa").clientWidth;
