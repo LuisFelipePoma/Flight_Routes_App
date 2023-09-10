@@ -39,9 +39,9 @@ let infoPanel;
 let isMouseDown = false, rotation = { x: 0, y: 0 };
 
 // Variables para guardar los links de las datasets
-const worldURL = 'https://raw.githubusercontent.com/LuisFelipePoma/D3-graph-gallery/master/DATA/world.geojson';
-const airportsURL = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/datasets/V3/airports.json';
-const routesURL = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/datasets/V3/routes.json';
+const worldURL = 'https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson';
+const airportsURL = 'https://raw.githubusercontent.com/LuisFelipePoma/DataSetForFlightRoutesApp/main/datasets/airports.json';
+const routesURL = 'https://raw.githubusercontent.com/LuisFelipePoma/DataSetForFlightRoutesApp/main/datasets/routes.json';
 
 // <------------------------------------------------------------------- Verificacion de la lectura de los datos ------------------------------------>//
 
@@ -59,6 +59,7 @@ myDataPromises.catch(function () {
 // <---------------------------------------------------------------- Funcion Init ---------------------------------------------------------------->//
 
 const init = (worldsData, airportsData, routesData) => {
+	console.log("Iniciando")
     geojson = worldsData
     airportjson = airportsData
     routesjson = routesData
@@ -231,8 +232,8 @@ const getJsonRoutesNodes = (algorithm) => {
     let pathsString = JSON.parse(pathsAPI);
     let routesIds = pathsString[algorithm]
     let airports = [];
-    console.log(algorithm)
-    console.log(routesIds)
+    // console.log(algorithm)
+    // console.log(routesIds)
     routesIds = routesIds.reverse();
 
     for (let i = 0; i < routesIds.length; ++i) {
@@ -248,6 +249,7 @@ const getJsonRoutesNodes = (algorithm) => {
         let content = { type: "LineString", coordinates: [[+airports[i - 1].lon, +airports[i - 1].lat], [+airports[i].lon, +airports[i].lat]] }
         routes.push(content)
     }
+	console.log(routes)
     return [airports, routes]
 }
 

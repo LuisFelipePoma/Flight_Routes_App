@@ -5,7 +5,7 @@ import heapq as hq
 import pandas as pd
 from haversine import haversine, Unit
 
-path = "https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/datasets/V3/routes.json"
+path = "https://raw.githubusercontent.com/LuisFelipePoma/DataSetForFlightRoutesApp/main/datasets/routes.json"
 
 def transformGraph():
     df = pd.read_json(path)
@@ -19,14 +19,12 @@ def transformGraph():
     origin_lon = pd.Series(df._get_column_array(6))
     destination_lat = pd.Series(df._get_column_array(8))
     destination_lon = pd.Series(df._get_column_array(9))
-
     id_origin = id_origin.tolist()
     id_destination = id_destination.tolist()
     origin_lat = origin_lat.tolist()
     origin_lon = origin_lon.tolist()
     destination_lat = destination_lat.tolist()
     destination_lon = destination_lon.tolist()
-
     for i in range(rows):
         a = (origin_lat[i], origin_lon[i])
         b = (destination_lat[i], destination_lon[i])

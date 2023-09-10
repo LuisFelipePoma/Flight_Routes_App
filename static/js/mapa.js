@@ -28,8 +28,8 @@ let choice = false;
 let isMouseDown = false, rotation = { x: 0, y: 0 };
 
 // Variables para guardar los links de las datasets
-const worldURL = 'https://raw.githubusercontent.com/LuisFelipePoma/D3-graph-gallery/master/DATA/world.geojson';
-const airportsURL = 'https://raw.githubusercontent.com/LuisFelipePoma/TF-Data/main/datasets/V3/airports.json';
+const worldURL = 'https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson';
+const airportsURL = 'https://raw.githubusercontent.com/LuisFelipePoma/DataSetForFlightRoutesApp/main/datasets/airports.json';
 
 // <------------------------------------------------------------------- Verificacion de la lectura de los datos ------------------------------------>//
 
@@ -69,7 +69,6 @@ const getAirports = (e, flag) => {
 
     // Se recorre el JSON seleccionado y se obtiene la lista de aeropuertos
     airportsData["_groups"][0].forEach(function (e) { lista_aeropuertos.push(e) })
-
     // Mediante este if verificamos a que form se agregara la informacion
     if (flag === false) SelectDir = "#listOrigenes";
     else SelectDir = "#listDestinos";
@@ -86,7 +85,7 @@ const getAirports = (e, flag) => {
         // Se le asigna al elemento sus atributos text(muestra en pantalla) y value(el valor del elemento)
         opt.text = contenido;
         opt.value = elementos.id;
-
+		// console.log(opt)
         // Finalmente se inserta en el form que direccione "formDir" y se inserta esa opcion
         document.querySelector(SelectDir).appendChild(opt);
     })

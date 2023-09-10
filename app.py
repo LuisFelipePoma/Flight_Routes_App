@@ -22,6 +22,7 @@ def serveJS(path):
 @app.route("/", methods=["GET", "POST"])
 def aver():
     if request.method == "POST":
+        print(request.form)
         origen = request.form["airportO"]
         destino = request.form["airportD"]
         origen = int(origen)
