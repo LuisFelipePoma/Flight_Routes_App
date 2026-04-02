@@ -136,3 +136,16 @@
 		@apply font-sans;
 	}
 }
+
+.country {
+	transition: opacity 140ms ease, stroke-width 140ms ease;
+}
+
+.country.hoverOff {
+	opacity: 0.3;
+}
+
+.country.hoverPass {
+	opacity: 1;
+	stroke-width: 1.1;
+}

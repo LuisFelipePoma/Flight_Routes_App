@@ -1,14 +1,14 @@
-import CommandLayout from "./layouts/CommandLayout"
-import World3dLayout from "./layouts/World3dLayout"
+import { Navigate, Route, Routes } from "react-router-dom"
+import { RoutesPage } from "@/pages/RoutesPage"
+import { SelectionPage } from "@/pages/SelectionPage"
 
 export function App() {
   return (
-    <div className="flex h-screen w-screen bg-background text-foreground">
-      <div className="flex w-full justify-between">
-        <CommandLayout />
-        <World3dLayout />
-      </div>
-    </div>
+    <Routes>
+      <Route path="/" element={<SelectionPage />} />
+      <Route path="/routes" element={<RoutesPage />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   )
 }
 

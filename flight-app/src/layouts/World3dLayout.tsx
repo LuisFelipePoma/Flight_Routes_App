@@ -1,7 +1,5 @@
-import React from 'react'
+import { Navigate } from "react-router-dom"
 
 export default function World3dLayout() {
-	return (
-		<div className="flex-1" id="mapa"></div>
-	)
+  return <Navigate to="/" replace />
 }
