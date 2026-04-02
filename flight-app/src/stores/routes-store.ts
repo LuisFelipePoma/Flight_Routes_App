@@ -7,7 +7,6 @@ import type { AlgorithmKey, FlightGraph, RouteResult } from "@/lib/types/flight"
 type ComputeState = "idle" | "computing"
 
 interface ComputeInput {
-  graph: FlightGraph | null
   originId: number | null
   destinationId: number | null
 }
@@ -29,7 +28,6 @@ function isValidInput(input: ComputeInput): input is {
   destinationId: number
 } {
   return (
-    input.graph !== null &&
     input.originId !== null &&
     input.destinationId !== null &&
     input.originId !== input.destinationId
@@ -71,7 +69,6 @@ export const useRoutesStore = create<RoutesState>((set, get) => ({
   primeContext(input) {
     set((state) => {
       const hasInputChanged =
-        state.lastInput.graph !== input.graph ||
         state.lastInput.originId !== input.originId ||
         state.lastInput.destinationId !== input.destinationId
 

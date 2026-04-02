@@ -1,8 +1,9 @@
-import type { RouteDatasetRecord, WorldDataset } from "@/lib/data/datasets"
 import { buildFlightGraph } from "@/lib/graph/build-graph"
-import type { Airport } from "@/lib/types/flight"
+import type { AirportResponseDTO } from "@/lib/services/interfaces/airports.interface"
+import type { RoutesResponseDTO } from "@/lib/services/interfaces/routes.interface"
+import type { WorlResponseDTO } from "@/lib/services/interfaces/world.interface"
 
-export const FIXTURE_WORLD: WorldDataset = {
+export const FIXTURE_WORLD: WorlResponseDTO = {
   type: "FeatureCollection",
   features: [
     {
@@ -27,7 +28,7 @@ export const FIXTURE_WORLD: WorldDataset = {
   ],
 }
 
-export const FIXTURE_AIRPORTS: Airport[] = [
+export const FIXTURE_AIRPORTS: Partial<AirportResponseDTO>[] = [
   {
     id: 1,
     airport_name: "Jorge Chavez",
@@ -54,7 +55,7 @@ export const FIXTURE_AIRPORTS: Airport[] = [
   },
 ]
 
-export const FIXTURE_ROUTES: RouteDatasetRecord[] = [
+export const FIXTURE_ROUTES: Partial<RoutesResponseDTO>[] = [
   {
     id_origin: 1,
     id_destination: 2,

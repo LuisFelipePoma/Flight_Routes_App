@@ -1,13 +1,15 @@
 import { useEffect, useMemo } from "react"
 import { Link, useNavigate } from "react-router-dom"
-
 import { GlobeCanvas, type OverlayArc, type OverlayEndpoint } from "@/components/globe/GlobeCanvas"
 import { RouteSummary } from "@/components/routes/RouteSummary"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import type { Airport, AlgorithmKey } from "@/lib/types/flight"
+import type { AlgorithmKey } from "@/lib/types/flight"
 import { useRoutesStore } from "@/stores/routes-store"
 import { useSelectionStore } from "@/stores/selection-store"
+import { useQDataset } from "@/lib/services/useQDataset"
+import type { AirportResponseDTO } from "@/lib/services/interfaces/airports.interface"
+import { useDataStore } from "@/stores/data-store"
 
 const ALGORITHMS: { key: AlgorithmKey; label: string; description: string }[] = [
   {
@@ -74,9 +76,9 @@ function toOverlayData(
 
 export function RoutesPage() {
   const navigate = useNavigate()
+  const { data: datasets } = useQDataset().query
+  const graph = useDataStore(s => s.graph)
 
-  const datasets = useSelectionStore((state) => state.datasets)
-  const graph = useSelectionStore((state) => state.graph)
   const originId = useSelectionStore((state) => state.originId)
   const destinationId = useSelectionStore((state) => state.destinationId)
 
@@ -89,11 +91,11 @@ export function RoutesPage() {
   const clearResult = useRoutesStore((state) => state.clearResult)
 
   useEffect(() => {
-    primeContext({ graph, originId, destinationId })
-  }, [destinationId, graph, originId, primeContext])
+    primeContext({ originId, destinationId })
+  }, [destinationId, originId, primeContext])
 
   useEffect(() => {
-    if (!graph || originId === null || destinationId === null || originId === destinationId) {
+    if (originId === null || destinationId === null || originId === destinationId) {
       return
     }
 
@@ -126,7 +128,7 @@ export function RoutesPage() {
 
   const airportsRecord = useMemo(
     () =>
-      (datasets?.airports ?? []).reduce<Record<number, Airport>>(
+      (datasets?.airports ?? []).reduce<Record<number, AirportResponseDTO>>(
         (acc, airport) => {
           acc[airport.id] = airport
           return acc
@@ -140,14 +142,14 @@ export function RoutesPage() {
 
   const handleAlgorithmChange = (next: AlgorithmKey) => {
     setAlgorithm(next)
-    primeContext({ graph, originId, destinationId })
+    primeContext({ originId, destinationId })
     if (hasPrerequisites) {
       computeRoute()
     }
   }
 
   const handleRecalculate = () => {
-    primeContext({ graph, originId, destinationId })
+    primeContext({ originId, destinationId })
     if (hasPrerequisites) {
       computeRoute()
     }
@@ -187,9 +189,8 @@ export function RoutesPage() {
               {ALGORITHMS.find((item) => item.key === algorithm)?.description}
             </p>
 
-            <div className="h-[460px] overflow-hidden rounded-lg border border-border">
+            <div className="h-115 overflow-hidden rounded-lg border border-border">
               <GlobeCanvas
-                world={datasets?.world ?? null}
                 overlayArcs={overlays.arcs}
                 overlayEndpoints={overlays.endpoints}
                 className="h-full"

@@ -8,8 +8,10 @@ import {
   type D3DragEvent,
 } from "d3"
 import type { FeatureCollection, GeoJsonProperties, Geometry } from "geojson"
+import { useSelectionStore } from "@/stores/selection-store"
+import { useQDataset } from "@/lib/services/useQDataset"
+import { useShallow } from "zustand/shallow"
 
-import type { WorldDataset } from "@/lib/data/datasets"
 
 interface OverlayArc {
   id: string
@@ -25,17 +27,14 @@ interface OverlayEndpoint {
 }
 
 interface GlobeCanvasProps {
-  world: WorldDataset | null
   width?: number
   height?: number
   className?: string
-  selectedCountryCode?: string | null
   overlayArcs?: OverlayArc[]
   overlayEndpoints?: OverlayEndpoint[]
-  onCountrySelect?: (countryCode: string) => void
 }
 
-const DEFAULT_WIDTH = 860
+const DEFAULT_WIDTH = 560
 const DEFAULT_HEIGHT = 520
 const DRAG_SENSITIVITY = 0.4
 
@@ -71,16 +70,25 @@ function getCountryCodeFromFeature(feature: unknown): string | null {
 }
 
 export function GlobeCanvas({
-  world,
   width = DEFAULT_WIDTH,
   height = DEFAULT_HEIGHT,
   className,
-  selectedCountryCode,
   overlayArcs = [],
   overlayEndpoints = [],
-  onCountrySelect,
 }: GlobeCanvasProps) {
+  const { data: dataset } = useQDataset().query
+  const onCountrySelect = useSelectionStore(s => s.selectCountryFromMap)
+
+  const { originCountryCode, destinationCountryCode } = useSelectionStore(useShallow(s => ({
+    originCountryCode: s.originCountryCode,
+    destinationCountryCode: s.destinationCountryCode
+  })))
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const isSelectedCountryCode = (code: string | null) => destinationCountryCode === code || originCountryCode === code
+
   const wrapperRef = useRef<HTMLDivElement | null>(null)
+  const rotationRef = useRef<[number, number, number]>([0, 0, 0])
 
   const normalizedArcs = useMemo(
     () =>
@@ -111,7 +119,7 @@ export function GlobeCanvas({
       .attr("aria-label", "Interactive globe for country and route visualization")
       .attr("class", "block h-full w-full")
 
-    if (!world) {
+    if (!dataset?.world) {
       svg
         .append("text")
         .attr("x", width / 2)
@@ -122,12 +130,12 @@ export function GlobeCanvas({
       return
     }
 
-    const geoWorld = world as unknown as FeatureCollection<Geometry, GeoJsonProperties>
+    const geoWorld = dataset?.world as unknown as FeatureCollection<Geometry, GeoJsonProperties>
 
     const projection = geoOrthographic()
       .fitSize([width * 0.9, height * 0.9], geoWorld)
       .translate([width / 2, height / 2])
-      .rotate([0, 0])
+      .rotate(rotationRef.current)
 
     const pathGenerator = geoPath(projection)
     const graticule = geoGraticule()
@@ -143,7 +151,7 @@ export function GlobeCanvas({
       .join("path")
       .attr("class", (feature) => {
         const code = getCountryCodeFromFeature(feature)
-        const isSelected = code !== null && selectedCountryCode === code
+        const isSelected = code !== null && isSelectedCountryCode(code)
         return isSelected ? "country selected" : "country"
       })
       .attr("data-country-code", (feature) => getCountryCodeFromFeature(feature) ?? "")
@@ -151,10 +159,10 @@ export function GlobeCanvas({
       .attr("fill", "var(--color-secondary)")
       .attr("stroke", "var(--color-border)")
       .attr("stroke-width", 0.6)
-      .style("cursor", onCountrySelect ? "pointer" : "default")
+      .style("cursor", "pointer")
 
     countryPaths
-      .filter((feature) => getCountryCodeFromFeature(feature) === selectedCountryCode)
+      .filter((feature) => isSelectedCountryCode(getCountryCodeFromFeature(feature)))
       .attr("fill", "var(--color-primary)")
 
     if (onCountrySelect) {
@@ -253,6 +261,7 @@ export function GlobeCanvas({
         ]
 
         rotation = nextRotation
+        rotationRef.current = nextRotation
         projection.rotate(nextRotation)
         updateProjectedLayers()
       }
@@ -264,16 +273,7 @@ export function GlobeCanvas({
       svg.on(".drag", null)
       root.selectAll("*").remove()
     }
-  }, [
-    className,
-    height,
-    normalizedArcs,
-    onCountrySelect,
-    overlayEndpoints,
-    selectedCountryCode,
-    width,
-    world,
-  ])
+  }, [className, dataset?.world, height, normalizedArcs, onCountrySelect, overlayEndpoints, isSelectedCountryCode, width])
 
   return (
     <div

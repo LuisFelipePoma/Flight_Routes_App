@@ -3,31 +3,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Field, FieldLabel } from "../ui/field"
 import type { SubmitEvent } from "react"
-
-interface SelectionOption {
-  value: string
-  label: string
-  disabled?: boolean
-}
+import { useSelectionStore } from "@/stores/selection-store"
+import { useDataStore } from "@/stores/data-store"
+import { useShallow } from "zustand/shallow"
 
 interface SelectionFormProps {
-  countries: SelectionOption[]
-  origins: SelectionOption[]
-  destinations: SelectionOption[]
-  originCountryCode: string | null
-  destinationCountryCode: string | null
-  originId: number | null
-  destinationId: number | null
   isLoading?: boolean
   isDisabled?: boolean
   loadError?: string | null
   validationMessage?: string | null
-  onOriginCountryChange: (countryCode: string | null) => void
-  onDestinationCountryChange: (countryCode: string | null) => void
-  onOriginChange: (originId: number | null) => void
-  onDestinationChange: (destinationId: number | null) => void
   onSubmit: () => void
-  onRetry?: () => void
 }
 
 function parseNullableNumber(value: string): number | null {
@@ -40,31 +25,26 @@ function parseNullableNumber(value: string): number | null {
 }
 
 export function SelectionForm({
-  countries,
-  origins,
-  destinations,
-  originCountryCode,
-  destinationCountryCode,
-  originId,
-  destinationId,
   isLoading = false,
   isDisabled = false,
   loadError,
   validationMessage,
-  onOriginCountryChange,
-  onDestinationCountryChange,
-  onOriginChange,
-  onDestinationChange,
   onSubmit,
-  onRetry,
 }: SelectionFormProps) {
+  const { countries } = useDataStore(useShallow((s) => ({ countries: s.countries })))
+  const originCountryCode = useSelectionStore((state) => state.originCountryCode)
+  const destinationCountryCode = useSelectionStore((state) => state.destinationCountryCode)
+  const setOriginCountry = useSelectionStore((state) => state.setOriginCountry)
+  const setDestinationCountry = useSelectionStore((state) => state.setDestinationCountry)
+  const originId = useSelectionStore((state) => state.originId)
+  const destinationId = useSelectionStore((state) => state.destinationId)
+  const setOrigin = useSelectionStore((state) => state.setOrigin)
+  const setDestination = useSelectionStore((state) => state.setDestination)
   const controlsDisabled = isDisabled || isLoading || Boolean(loadError)
   const submitDisabled =
     controlsDisabled ||
     !originCountryCode ||
     !destinationCountryCode ||
-    originId === null ||
-    destinationId === null ||
     Boolean(validationMessage)
 
   const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
@@ -75,7 +55,7 @@ export function SelectionForm({
   }
 
   return (
-    <Card>
+    <Card className="h-fit">
       <CardHeader>
         <CardTitle>Flight route selection</CardTitle>
         <CardDescription>
@@ -93,7 +73,7 @@ export function SelectionForm({
                   value={originCountryCode ?? ""}
                   aria-required="true"
                   onValueChange={(event) => {
-                    onOriginCountryChange(event || null)
+                    setOriginCountry(event || null)
                   }}
                   aria-describedby={loadError ? "selection-load-error" : undefined}
                 >
@@ -116,7 +96,7 @@ export function SelectionForm({
                   value={destinationCountryCode ?? ""}
                   aria-required="true"
                   onValueChange={(event) => {
-                    onDestinationCountryChange(event || null)
+                    setDestinationCountry(event || null)
                   }}
                   aria-describedby={loadError ? "selection-load-error" : undefined}
                 >
@@ -141,7 +121,7 @@ export function SelectionForm({
                   value={originId !== null ? String(originId) : ""}
                   aria-required="true"
                   onValueChange={(event) => {
-                    onOriginChange(parseNullableNumber(event))
+                    setOrigin(parseNullableNumber(event))
                   }}
                   disabled={controlsDisabled || !originCountryCode}
                   aria-describedby={validationMessage ? "selection-validation" : undefined}
@@ -151,7 +131,7 @@ export function SelectionForm({
                     <SelectValue placeholder="Select origin airport" />
                   </SelectTrigger>
                   <SelectContent position="popper" className="max-h-72">
-                    {origins.map((option) => (
+                    {countries.filter((option) => option.value === originCountryCode).map((option) => (
                       <SelectItem key={option.value} value={option.value} disabled={option.disabled}>
                         {option.label}
                       </SelectItem>
@@ -166,7 +146,7 @@ export function SelectionForm({
                   value={destinationId !== null ? String(destinationId) : ""}
                   aria-required="true"
                   onValueChange={(event) => {
-                    onDestinationChange(parseNullableNumber(event))
+                    setDestination(parseNullableNumber(event))
                   }}
                   disabled={controlsDisabled || !destinationCountryCode}
                   aria-describedby={validationMessage ? "selection-validation" : undefined}
@@ -176,7 +156,7 @@ export function SelectionForm({
                     <SelectValue placeholder="Select destination airport" />
                   </SelectTrigger>
                   <SelectContent position="popper" className="max-h-72">
-                    {destinations.map((option) => (
+                    {countries.filter((option) => option.value === destinationCountryCode).map((option) => (
                       <SelectItem key={option.value} value={option.value} disabled={option.disabled}>
                         {option.label}
                       </SelectItem>
@@ -205,16 +185,6 @@ export function SelectionForm({
               className="flex flex-col gap-3 rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm"
             >
               <p className="text-destructive">{loadError}</p>
-              <div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={onRetry}
-                  disabled={!onRetry || isLoading}
-                >
-                  Retry loading datasets
-                </Button>
-              </div>
             </div>
           ) : null}
 
@@ -229,4 +199,4 @@ export function SelectionForm({
   )
 }
 
-export type { SelectionFormProps, SelectionOption }
+export type { SelectionFormProps }

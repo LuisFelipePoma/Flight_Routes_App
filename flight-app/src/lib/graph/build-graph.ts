@@ -1,5 +1,6 @@
-import type { RouteDatasetRecord } from "@/lib/data/datasets"
-import type { Airport, FlightGraph, RouteEdge } from "@/lib/types/flight"
+import type { FlightGraph, RouteEdge } from "@/lib/types/flight"
+import type { RoutesResponseDTO } from "../services/interfaces/routes.interface";
+import type { AirportResponseDTO } from "../services/interfaces/airports.interface";
 
 const EARTH_RADIUS_KM = 6371
 
@@ -19,9 +20,7 @@ export function haversine(
 
   const a =
     Math.sin(dLat / 2) ** 2 +
-    Math.cos(originLat) *
-      Math.cos(destinationLat) *
-      Math.sin(dLon / 2) ** 2
+    Math.cos(originLat) * Math.cos(destinationLat) * Math.sin(dLon / 2) ** 2
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
   return EARTH_RADIUS_KM * c
@@ -39,7 +38,7 @@ function isFiniteCoordinate(value: number): boolean {
   return Number.isFinite(value)
 }
 
-export function buildAdjacencyGraph(routes: RouteDatasetRecord[]): FlightGraph {
+export function buildAdjacencyGraph(routes: RoutesResponseDTO[]): FlightGraph {
   const graph: FlightGraph = {}
 
   for (const route of routes) {
@@ -80,8 +79,8 @@ export function buildAdjacencyGraph(routes: RouteDatasetRecord[]): FlightGraph {
 }
 
 export function buildFlightGraph(
-  airports: Airport[],
-  routes: RouteDatasetRecord[]
+  airports: AirportResponseDTO[],
+  routes: RoutesResponseDTO[]
 ): FlightGraph {
   const graph = buildAdjacencyGraph(routes)
 
