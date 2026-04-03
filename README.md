@@ -1,65 +1,65 @@
 # Flight Routes App
 
-Aplicación académica y técnica para explorar rutas aéreas entre aeropuertos usando algoritmos de grafos.
+Academic and technical application to explore airline routes between airports using graph algorithms.
 
-Este repositorio contiene dos implementaciones del proyecto:
+This repository contains two implementations of the project:
 
-- **Nueva versión**: frontend moderno en React + TypeScript + Vite.
-- **Versión antigua (`old_version`)**: aplicación web en Flask + Python.
+- **New version**: modern frontend built with React + TypeScript + Vite.
+- **Legacy version (`old_version`)**: web application built with Flask + Python.
 
-## Demo en Producción
+## Production Demo
 
-- Nueva versión (React): https://flight-routes-app-puce.vercel.app/
-- Versión antigua (Flask): https://felipe03.pythonanywhere.com/
+- New version (React): https://flight-routes-app-puce.vercel.app/
+- Legacy version (Flask): https://felipe03.pythonanywhere.com/
 
-## Resumen del Proyecto
+## Project Overview
 
-El sistema permite seleccionar aeropuerto de origen y destino, ejecutar algoritmos de búsqueda/trazado de rutas y visualizar el resultado.
+The system allows users to select origin and destination airports, run route-finding algorithms, and visualize the computed result.
 
-### Objetivos
+### Goals
 
-- Comparar aproximaciones algorítmicas sobre un grafo de rutas aéreas.
-- Visualizar resultados de forma clara y accesible.
-- Mostrar evolución arquitectónica entre una versión monolítica inicial y una versión moderna modular.
+- Compare algorithmic approaches over an airline route graph.
+- Visualize results in a clear and accessible way.
+- Show the architectural evolution from an initial monolithic version to a modern modular version.
 
-## Estructura del Repositorio
+## Repository Structure
 
 ```text
 Flight_Routes_App/
-|-- flight-app/      # Nueva versión (React + TypeScript)
-|-- old_version/     # Implementación legacy (Flask + Python)
+|-- flight-app/      # New version (React + TypeScript)
+|-- old_version/     # Legacy implementation (Flask + Python)
 `-- README.md
 ```
 
-## Nueva Versión: `flight-app`
+## New Version: `flight-app`
 
-### Stack técnico
+### Tech stack
 
 - React 19 + TypeScript
 - Vite
 - Tailwind CSS 4
-- Zustand (estado global)
-- TanStack React Query (datos remotos)
+- Zustand (global state)
+- TanStack React Query (remote data)
 - Vitest + Testing Library (tests)
 
-### Funcionalidades principales
+### Main features
 
-- Selección de origen y destino con validaciones.
-- Cálculo de rutas usando:
+- Origin and destination selection with validations.
+- Route computation using:
   - Dijkstra
   - DFS
-  - Prim (ruta derivada de frontera MST)
-- Visualización en globo 3D con overlays de nodos y arcos.
-- Resumen accesible de resultados de ruta.
+  - Prim (MST frontier-derived path)
+- 3D globe visualization with node and arc overlays.
+- Accessible route summary output.
 
-### Ejecutar localmente
+### Run locally
 
-Requisitos:
+Requirements:
 
-- Node.js 20+ (recomendado)
+- Node.js 20+ (recommended)
 - npm
 
-Pasos:
+Steps:
 
 ```bash
 cd flight-app
@@ -67,39 +67,39 @@ npm install
 npm run dev
 ```
 
-Scripts útiles:
+Useful scripts:
 
 ```bash
-npm run test       # modo watch
-npm run test:run   # corrida única
+npm run test       # watch mode
+npm run test:run   # single run
 npm run typecheck
 npm run lint
 npm run build
 ```
 
-## Versión Antigua: `old_version`
+## Legacy Version: `old_version`
 
-### Stack técnico
+### Tech stack
 
 - Python 3.11
 - Flask
 - Pandas / NumPy
-- Gunicorn (despliegue)
+- Gunicorn (deployment)
 
-### Funcionalidades
+### Features
 
-- Formulario de selección de aeropuertos.
-- Cálculo de ruta desde backend Python.
-- Render server-side con plantillas HTML (`templates/`).
+- Airport selection form.
+- Route computation in the Python backend.
+- Server-side rendering using HTML templates (`templates/`).
 
-### Ejecutar localmente
+### Run locally
 
-Requisitos:
+Requirements:
 
 - Python 3.11
 - pip
 
-Pasos:
+Steps:
 
 ```bash
 cd old_version
@@ -112,20 +112,20 @@ pip install -r requirements.txt
 python app.py
 ```
 
-## Diferencias Clave Entre Versiones
+## Key Differences Between Versions
 
-| Aspecto | Nueva versión (`flight-app`) | Antigua (`old_version`) |
+| Aspect | New version (`flight-app`) | Legacy version (`old_version`) |
 |---|---|---|
-| Arquitectura | Frontend SPA modular | Backend monolítico con render de servidor |
-| UI/UX | Interactiva, componente-driven | Plantillas HTML/CSS/JS tradicionales |
-| Estado y datos | Zustand + React Query | Manejo directo en Flask |
-| Testing | Vitest + Testing Library | Sin suite formal de tests |
-| Despliegue | Vercel | PythonAnywhere |
+| Architecture | Modular SPA frontend | Monolithic backend with server-side rendering |
+| UI/UX | Interactive, component-driven | Traditional HTML/CSS/JS templates |
+| State and data | Zustand + React Query | Direct handling in Flask |
+| Testing | Vitest + Testing Library | No formal test suite |
+| Deployment | Vercel | PythonAnywhere |
 
-## Propósito Académico
+## Academic Purpose
 
-Este repositorio evidencia la evolución de una solución de **complejidad algorítmica aplicada**: desde una implementación inicial funcional en Flask hasta una arquitectura moderna, tipada y testeable en React.
+This repository demonstrates the evolution of an **applied algorithmic complexity** solution: from an initial functional Flask implementation to a modern, typed, and testable React architecture.
 
-## Autor
+## Author
 
-Desarrollado por **Luis Felipe Poma**.
+Developed by **Luis Felipe Poma**.
