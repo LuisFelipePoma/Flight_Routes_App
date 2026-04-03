@@ -1,14 +1,40 @@
 import { render, screen } from "@testing-library/react"
 import { waitFor } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
-import { describe, expect, it } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import { RouteSummary } from "@/components/routes/RouteSummary"
 import { RoutesPage } from "@/pages/RoutesPage"
-import { FIXTURE_AIRPORTS } from "@/test/fixtures/flight-fixtures"
+import { FIXTURE_AIRPORTS, FIXTURE_ROUTES, FIXTURE_WORLD } from "@/test/fixtures/flight-fixtures"
 import type { FlightGraph } from "@/lib/types/flight"
 import { useRoutesStore } from "@/stores/routes-store"
 import { useSelectionStore } from "@/stores/selection-store"
+import { useDataStore } from "@/stores/data-store"
+
+const { useQDatasetMock } = vi.hoisted(() => ({
+  useQDatasetMock: vi.fn(),
+}))
+
+vi.mock("@/lib/services/useQDataset", async () => {
+  const actual = await vi.importActual<typeof import("@/lib/services/useQDataset")>("@/lib/services/useQDataset")
+  return {
+    ...actual,
+    useQDataset: useQDatasetMock,
+  }
+})
+
+beforeEach(() => {
+  useQDatasetMock.mockReturnValue({
+    query: {
+      data: {
+        world: FIXTURE_WORLD,
+        airports: FIXTURE_AIRPORTS,
+        routes: FIXTURE_ROUTES,
+      },
+      isLoading: false,
+    },
+  })
+})
 
 describe("route-visualization scenarios", () => {
   it("renders route details equivalent to arc/node visual data", () => {
@@ -83,41 +109,17 @@ describe("routes page overlay synchronization", () => {
       3: [],
     }
 
-    useSelectionStore.setState({
-      datasets: {
-        world: {
-          type: "FeatureCollection",
-          features: [
-            {
-              id: "PE",
-              type: "Feature",
-              geometry: {
-                type: "Polygon",
-                coordinates: [
-                  [
-                    [-82, -18],
-                    [-68, -18],
-                    [-68, 0],
-                    [-82, 0],
-                    [-82, -18],
-                  ],
-                ],
-              },
-            },
-          ],
-        },
-        airports: FIXTURE_AIRPORTS,
-        routes: [],
-      },
+    useDataStore.setState({
       graph,
-      isLoading: false,
-      error: null,
+      countries: [],
+      airportsOptions: {},
+    })
+
+    useSelectionStore.setState({
       originCountryCode: "PE",
       destinationCountryCode: "PE",
       originId: 1,
       destinationId: 3,
-      validationMessage: null,
-      canSubmit: true,
     })
 
     useRoutesStore.setState({
@@ -125,7 +127,6 @@ describe("routes page overlay synchronization", () => {
       computeState: "idle",
       result: null,
       lastInput: {
-        graph,
         originId: 1,
         destinationId: 3,
       },
@@ -150,24 +151,17 @@ describe("routes page overlay synchronization", () => {
       3: [],
     }
 
-    useSelectionStore.setState({
-      datasets: {
-        world: {
-          type: "FeatureCollection",
-          features: [],
-        },
-        airports: FIXTURE_AIRPORTS,
-        routes: [],
-      },
+    useDataStore.setState({
       graph: disconnected,
-      isLoading: false,
-      error: null,
+      countries: [],
+      airportsOptions: {},
+    })
+
+    useSelectionStore.setState({
       originCountryCode: "PE",
       destinationCountryCode: "PE",
       originId: 1,
       destinationId: 3,
-      validationMessage: null,
-      canSubmit: true,
     })
 
     useRoutesStore.setState({
@@ -175,7 +169,6 @@ describe("routes page overlay synchronization", () => {
       computeState: "idle",
       result: null,
       lastInput: {
-        graph: disconnected,
         originId: 1,
         destinationId: 3,
       },

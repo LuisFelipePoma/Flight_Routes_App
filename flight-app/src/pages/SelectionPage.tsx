@@ -17,8 +17,18 @@ export function SelectionPage() {
 
   const { data: dataset, isLoading } = useQDataset().query
 
+  const hasSelectedAirports =
+    originId !== null && destinationId !== null && originId !== destinationId
+  const validationMessage =
+    originId !== null && destinationId !== null && originId === destinationId
+      ? "Origin and destination must be different airports."
+      : null
 
   const handleSubmit = () => {
+    if (!hasSelectedAirports) {
+      return
+    }
+
     primeContext({
       originId,
       destinationId,
@@ -28,7 +38,7 @@ export function SelectionPage() {
   }
   useEffect(() => {
     if (dataset) {
-      seedData(dataset.routes, dataset.world, dataset.airports)
+      seedData(dataset.routes, dataset.airports)
     }
   }, [dataset, seedData])
 
@@ -41,6 +51,7 @@ export function SelectionPage() {
 
         <SelectionForm
           isLoading={isLoading}
+          validationMessage={validationMessage}
           onSubmit={handleSubmit}
         />
         <GlobeCanvas

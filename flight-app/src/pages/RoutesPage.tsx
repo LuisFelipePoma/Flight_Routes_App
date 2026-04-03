@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { GlobeCanvas, type OverlayArc, type OverlayEndpoint } from "@/components/globe/GlobeCanvas"
 import { RouteSummary } from "@/components/routes/RouteSummary"
 import { Button } from "@/components/ui/button"
@@ -54,7 +54,7 @@ function toOverlayData(
         kind,
       } satisfies OverlayEndpoint
     })
-    .filter((value): value is OverlayEndpoint => value !== null)
+    .filter((value) => value !== null)
 
   const arcs: OverlayArc[] = []
   for (let index = 0; index < airportIds.length - 1; index += 1) {
@@ -78,10 +78,8 @@ export function RoutesPage() {
   const navigate = useNavigate()
   const { data: datasets } = useQDataset().query
   const graph = useDataStore(s => s.graph)
-
   const originId = useSelectionStore((state) => state.originId)
   const destinationId = useSelectionStore((state) => state.destinationId)
-
   const algorithm = useRoutesStore((state) => state.algorithm)
   const result = useRoutesStore((state) => state.result)
   const computeState = useRoutesStore((state) => state.computeState)
@@ -89,7 +87,6 @@ export function RoutesPage() {
   const primeContext = useRoutesStore((state) => state.primeContext)
   const computeRoute = useRoutesStore((state) => state.computeRoute)
   const clearResult = useRoutesStore((state) => state.clearResult)
-
   useEffect(() => {
     primeContext({ originId, destinationId })
   }, [destinationId, originId, primeContext])
@@ -98,8 +95,10 @@ export function RoutesPage() {
     if (originId === null || destinationId === null || originId === destinationId) {
       return
     }
-
-    computeRoute()
+    primeContext({ originId, destinationId })
+    if (graph) {
+      computeRoute(graph)
+    }
     // intentionally compute only on page ready
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -108,8 +107,12 @@ export function RoutesPage() {
     () =>
       new Map(
         (datasets?.airports ?? []).map((airport) => [
-          airport.id,
-          airport,
+          Number(airport.id),
+          {
+            id: Number(airport.id),
+            lat: parseFloat(airport.lat),
+            lon: parseFloat(airport.lon),
+          },
         ])
       ),
     [datasets]
@@ -130,7 +133,7 @@ export function RoutesPage() {
     () =>
       (datasets?.airports ?? []).reduce<Record<number, AirportResponseDTO>>(
         (acc, airport) => {
-          acc[airport.id] = airport
+          acc[Number(airport.id)] = airport
           return acc
         },
         {}
@@ -144,14 +147,14 @@ export function RoutesPage() {
     setAlgorithm(next)
     primeContext({ originId, destinationId })
     if (hasPrerequisites) {
-      computeRoute()
+      computeRoute(graph)
     }
   }
 
   const handleRecalculate = () => {
     primeContext({ originId, destinationId })
     if (hasPrerequisites) {
-      computeRoute()
+      computeRoute(graph)
     }
   }
 
@@ -161,77 +164,79 @@ export function RoutesPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background px-6 py-8 text-foreground">
+    <main className="h-screen w-screen bg-background px-6 py-8 text-foreground">
       <section
-        className="mx-auto grid w-full max-w-7xl gap-6 lg:grid-cols-[1.2fr_1fr]"
+        className="grid w-full gap-6 lg:grid-cols-[1.2fr_1fr] h-full"
         aria-labelledby="routes-page-title"
       >
         <Card>
           <CardHeader>
             <CardTitle id="routes-page-title">Route visualization</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-wrap gap-2" role="group" aria-label="Algorithm selector">
-              {ALGORITHMS.map((item) => (
-                <Button
-                  key={item.key}
-                  type="button"
-                  variant={algorithm === item.key ? "default" : "outline"}
-                  onClick={() => handleAlgorithmChange(item.key)}
-                  aria-pressed={algorithm === item.key}
-                >
-                  {item.label}
-                </Button>
-              ))}
-            </div>
+          <CardContent className="grid grid-rows-[1fr_8fr_1fr] gap-4 h-full">
+            <section className="flex flex-col gap-2">
+              <div className="flex flex-wrap gap-2" role="group" aria-label="Algorithm selector">
+                {ALGORITHMS.map((item) => (
+                  <Button
+                    key={item.key}
+                    type="button"
+                    variant={algorithm === item.key ? "default" : "outline"}
+                    onClick={() => handleAlgorithmChange(item.key)}
+                    aria-pressed={algorithm === item.key}
+                  >
+                    {item.label}
+                  </Button>
+                ))}
+              </div>
 
-            <p className="text-sm text-muted-foreground">
-              {ALGORITHMS.find((item) => item.key === algorithm)?.description}
-            </p>
+              <p className="text-sm text-muted-foreground">
+                {ALGORITHMS.find((item) => item.key === algorithm)?.description}
+              </p>
+            </section>
 
-            <div className="h-115 overflow-hidden rounded-lg border border-border">
+            <section className="h-full overflow-hidden rounded-lg border border-border bg-background">
               <GlobeCanvas
                 overlayArcs={overlays.arcs}
                 overlayEndpoints={overlays.endpoints}
                 className="h-full"
               />
-            </div>
+            </section>
 
-            {result?.status === "no-route" ? (
-              <p role="status" className="text-sm text-muted-foreground">
-                No route exists between the selected airports for the active algorithm.
-              </p>
-            ) : null}
+            <section className="flex flex-col">
+              {result?.status === "no-route" ? (
+                <p role="status" className="text-sm text-muted-foreground">
+                  No route exists between the selected airports for the active algorithm.
+                </p>
+              ) : null}
 
-            {!result ? (
-              <p role="status" className="text-sm text-muted-foreground">
-                No calculation yet. Choose an algorithm and run a calculation.
-              </p>
-            ) : null}
+              {!result ? (
+                <p role="status" className="text-sm text-muted-foreground">
+                  No calculation yet. Choose an algorithm and run a calculation.
+                </p>
+              ) : null}
 
-            <div className="flex flex-wrap items-center gap-2">
-              <Button
-                type="button"
-                onClick={handleRecalculate}
-                disabled={!hasPrerequisites || computeState === "computing"}
-              >
-                {computeState === "computing" ? "Calculating..." : "Recalculate route"}
-              </Button>
-              <Button type="button" variant="outline" onClick={handleBackToSelection}>
-                Back to selection
-              </Button>
-              <Button asChild type="button" variant="ghost">
-                <Link to="/">Open selection page</Link>
-              </Button>
-            </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  type="button"
+                  onClick={handleRecalculate}
+                  disabled={!hasPrerequisites || computeState === "computing"}
+                >
+                  {computeState === "computing" ? "Calculating..." : "Recalculate route"}
+                </Button>
+                <Button type="button" variant="outline" onClick={handleBackToSelection}>
+                  Back to selection
+                </Button>
+
+              </div>
+            </section>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="h-full">
           <CardHeader>
             <CardTitle>Accessible route details</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="h-full">
             <RouteSummary result={result} airportsById={airportsRecord} />
           </CardContent>
         </Card>

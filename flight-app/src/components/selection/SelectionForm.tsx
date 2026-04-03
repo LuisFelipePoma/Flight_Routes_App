@@ -31,7 +31,10 @@ export function SelectionForm({
   validationMessage,
   onSubmit,
 }: SelectionFormProps) {
-  const { countries } = useDataStore(useShallow((s) => ({ countries: s.countries })))
+  const { countries, airportsOptions } = useDataStore(useShallow((s) => ({
+    countries: s.countries
+    , airportsOptions: s.airportsOptions
+  })))
   const originCountryCode = useSelectionStore((state) => state.originCountryCode)
   const destinationCountryCode = useSelectionStore((state) => state.destinationCountryCode)
   const setOriginCountry = useSelectionStore((state) => state.setOriginCountry)
@@ -45,6 +48,8 @@ export function SelectionForm({
     controlsDisabled ||
     !originCountryCode ||
     !destinationCountryCode ||
+    originId === null ||
+    destinationId === null ||
     Boolean(validationMessage)
 
   const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
@@ -82,7 +87,7 @@ export function SelectionForm({
                   </SelectTrigger>
                   <SelectContent position="popper" className="max-h-72">
                     {countries.map((option) => (
-                      <SelectItem key={option.value} value={option.value} disabled={option.disabled}>
+                      <SelectItem key={option.value} value={String(option.value)} disabled={option.disabled}>
                         {option.label}
                       </SelectItem>
                     ))}
@@ -105,7 +110,7 @@ export function SelectionForm({
                   </SelectTrigger>
                   <SelectContent position="popper" className="max-h-72">
                     {countries.map((option) => (
-                      <SelectItem key={option.value} value={option.value} disabled={option.disabled}>
+                      <SelectItem key={option.value} value={String(option.value)} disabled={option.disabled}>
                         {option.label}
                       </SelectItem>
                     ))}
@@ -131,8 +136,8 @@ export function SelectionForm({
                     <SelectValue placeholder="Select origin airport" />
                   </SelectTrigger>
                   <SelectContent position="popper" className="max-h-72">
-                    {countries.filter((option) => option.value === originCountryCode).map((option) => (
-                      <SelectItem key={option.value} value={option.value} disabled={option.disabled}>
+                    {airportsOptions[originCountryCode!]?.map((option) => (
+                      <SelectItem key={option.value} value={String(option.value)} disabled={option.disabled}>
                         {option.label}
                       </SelectItem>
                     ))}
@@ -156,8 +161,8 @@ export function SelectionForm({
                     <SelectValue placeholder="Select destination airport" />
                   </SelectTrigger>
                   <SelectContent position="popper" className="max-h-72">
-                    {countries.filter((option) => option.value === destinationCountryCode).map((option) => (
-                      <SelectItem key={option.value} value={option.value} disabled={option.disabled}>
+                    {airportsOptions[destinationCountryCode!]?.map((option) => (
+                      <SelectItem key={option.value} value={String(option.value)} disabled={option.disabled}>
                         {option.label}
                       </SelectItem>
                     ))}

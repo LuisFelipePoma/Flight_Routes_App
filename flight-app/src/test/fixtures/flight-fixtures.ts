@@ -1,9 +1,9 @@
 import { buildFlightGraph } from "@/lib/graph/build-graph"
 import type { AirportResponseDTO } from "@/lib/services/interfaces/airports.interface"
 import type { RoutesResponseDTO } from "@/lib/services/interfaces/routes.interface"
-import type { WorlResponseDTO } from "@/lib/services/interfaces/world.interface"
+import type { WorldResponseDTO } from "@/lib/services/interfaces/world.interface"
 
-export const FIXTURE_WORLD: WorlResponseDTO = {
+export const FIXTURE_WORLD: WorldResponseDTO = {
   type: "FeatureCollection",
   features: [
     {
@@ -28,49 +28,63 @@ export const FIXTURE_WORLD: WorlResponseDTO = {
   ],
 }
 
-export const FIXTURE_AIRPORTS: Partial<AirportResponseDTO>[] = [
+export const FIXTURE_AIRPORTS: AirportResponseDTO[] = [
   {
-    id: 1,
+    id: "1",
     airport_name: "Jorge Chavez",
     city: "Lima",
     country_code: "PE",
-    lat: -12.0219,
-    lon: -77.1143,
+    lat: "-12.0219",
+    lon: "-77.1143",
+    code_airport: "LIM",
+    country: "Peru",
   },
   {
-    id: 2,
+    id: "2",
     airport_name: "Velasco Astete",
     city: "Cusco",
     country_code: "PE",
-    lat: -13.5357,
-    lon: -71.9388,
+    lat: "-13.5357",
+    lon: "-71.9388",
+    code_airport: "CUZ",
+    country: "Peru",
   },
   {
-    id: 3,
+    id: "3",
     airport_name: "Rodriguez Ballon",
     city: "Arequipa",
     country_code: "PE",
-    lat: -16.3411,
-    lon: -71.583,
+    lat: "-16.3411",
+    lon: "-71.583",
+    code_airport: "AQP",
+    country: "Peru",
   },
 ]
 
-export const FIXTURE_ROUTES: Partial<RoutesResponseDTO>[] = [
+export const FIXTURE_ROUTES: RoutesResponseDTO[] = [
   {
-    id_origin: 1,
-    id_destination: 2,
-    origin_lat: -12.0219,
-    origin_lon: -77.1143,
-    destination_lat: -13.5357,
-    destination_lon: -71.9388,
+    id_origin: "1",
+    id_destination: "2",
+    origin_lat: "-12.0219",
+    origin_lon: "-77.1143",
+    destination_lat: "-13.5357",
+    destination_lon: "-71.9388",
+    code_destination: "CUZ",
+    code_origin: "LIM",
+    destination_country: "Peru",
+    origin_country: "Peru",
   },
   {
-    id_origin: 2,
-    id_destination: 3,
-    origin_lat: -13.5357,
-    origin_lon: -71.9388,
-    destination_lat: -16.3411,
-    destination_lon: -71.583,
+    id_origin: "2",
+    id_destination: "3",
+    origin_lat: "-13.5357",
+    origin_lon: "-71.9388",
+    destination_lat: "-16.3411",
+    destination_lon: "-71.583",
+    code_destination: "AQP",
+    code_origin: "CUZ",
+    destination_country: "Peru",
+    origin_country: "Peru",
   },
 ]
 

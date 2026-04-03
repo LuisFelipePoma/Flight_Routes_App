@@ -30,7 +30,6 @@ describe("route-calculation scenarios", () => {
       computeState: "idle",
       result: null,
       lastInput: {
-        graph: null,
         originId: null,
         destinationId: null,
       },
@@ -55,16 +54,23 @@ describe("route-calculation scenarios", () => {
   })
 
   it("rejects missing prerequisites through store compute gateway", () => {
-    useRoutesStore.getState().primeContext({
-      graph: null,
-      originId: 1,
-      destinationId: 2,
-    })
-
-    useRoutesStore.getState().computeRoute()
+    useRoutesStore.getState().computeRoute(CONNECTED_GRAPH)
 
     const result = useRoutesStore.getState().result
     expect(result?.status).toBe("error")
     expect(result?.message).toContain("Select two different airports")
+  })
+
+  it("computes route after priming context with active signature", () => {
+    useRoutesStore.getState().primeContext({
+      originId: 1,
+      destinationId: 4,
+    })
+
+    useRoutesStore.getState().computeRoute(CONNECTED_GRAPH)
+
+    const result = useRoutesStore.getState().result
+    expect(result?.status).toBe("ok")
+    expect(result?.airportIds).toEqual([1, 2, 3, 4])
   })
 })

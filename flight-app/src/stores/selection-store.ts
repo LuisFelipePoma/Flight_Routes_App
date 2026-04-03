@@ -1,10 +1,13 @@
 import { create } from "zustand"
 
-interface SelectionState {
+export interface SelectionState {
   originCountryCode: string | null
   destinationCountryCode: string | null
   originId: number | null
   destinationId: number | null
+}
+
+export interface SelectionActions {
   setOriginCountry: (countryCode: string | null) => void
   setDestinationCountry: (countryCode: string | null) => void
   selectCountryFromMap: (countryCode: string) => void
@@ -13,12 +16,17 @@ interface SelectionState {
   resetSelection: () => void
 }
 
-export const useSelectionStore = create<SelectionState>((set) => ({
-  datasets: null,
+type SelectionStore = SelectionState & SelectionActions
+
+export const INITIAL_SELECTION_STATE: SelectionState = {
   originCountryCode: null,
   destinationCountryCode: null,
   originId: null,
   destinationId: null,
+}
+
+export const useSelectionStore = create<SelectionStore>((set) => ({
+  ...INITIAL_SELECTION_STATE,
 
   setOriginCountry(countryCode) {
     set(() => ({
@@ -34,7 +42,6 @@ export const useSelectionStore = create<SelectionState>((set) => ({
 
   selectCountryFromMap(countryCode) {
     set((state) => {
-			// SIMPLE WAY DEAHH
       if (!state.originCountryCode) {
         return {
           originCountryCode: countryCode,
@@ -70,11 +77,6 @@ export const useSelectionStore = create<SelectionState>((set) => ({
   },
 
   resetSelection() {
-    set(() => ({
-      originCountryCode: null,
-      destinationCountryCode: null,
-      originId: null,
-      destinationId: null,
-    }))
+    set(() => ({ ...INITIAL_SELECTION_STATE }))
   },
 }))

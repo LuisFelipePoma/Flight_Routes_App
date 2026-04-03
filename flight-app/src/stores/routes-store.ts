@@ -6,7 +6,7 @@ import type { AlgorithmKey, FlightGraph, RouteResult } from "@/lib/types/flight"
 
 type ComputeState = "idle" | "computing"
 
-interface ComputeInput {
+export interface ComputeInput {
   originId: number | null
   destinationId: number | null
 }
@@ -19,11 +19,10 @@ interface RoutesState {
   setAlgorithm: (algorithm: AlgorithmKey) => void
   primeContext: (input: ComputeInput) => void
   clearResult: () => void
-  computeRoute: () => void
+  computeRoute: (graph: FlightGraph) => void
 }
 
 function isValidInput(input: ComputeInput): input is {
-  graph: FlightGraph
   originId: number
   destinationId: number
 } {
@@ -34,7 +33,10 @@ function isValidInput(input: ComputeInput): input is {
   )
 }
 
-function makeErrorResult(algorithm: AlgorithmKey, message: string): RouteResult {
+function makeErrorResult(
+  algorithm: AlgorithmKey,
+  message: string
+): RouteResult {
   return {
     algorithm,
     status: "error",
@@ -57,7 +59,6 @@ export const useRoutesStore = create<RoutesState>((set, get) => ({
   computeState: "idle",
   result: null,
   lastInput: {
-    graph: null,
     originId: null,
     destinationId: null,
   },
@@ -83,7 +84,7 @@ export const useRoutesStore = create<RoutesState>((set, get) => ({
     set({ result: null, computeState: "idle" })
   },
 
-  computeRoute() {
+  computeRoute(graph: FlightGraph) {
     const { algorithm, lastInput } = get()
 
     if (!isValidInput(lastInput)) {
@@ -97,7 +98,7 @@ export const useRoutesStore = create<RoutesState>((set, get) => ({
       return
     }
 
-    const { graph, originId, destinationId } = lastInput
+    const { originId, destinationId } = lastInput
 
     set({
       computeState: "computing",

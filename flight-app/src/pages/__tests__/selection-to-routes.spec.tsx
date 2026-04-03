@@ -4,50 +4,56 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import { MemoryRouter, Route, Routes } from "react-router-dom"
 
 import { App } from "@/App"
-import { FIXTURE_AIRPORTS, FIXTURE_ROUTES, FIXTURE_WORLD, createFixtureGraph } from "@/test/fixtures/flight-fixtures"
+import { FIXTURE_AIRPORTS, FIXTURE_ROUTES, FIXTURE_WORLD } from "@/test/fixtures/flight-fixtures"
 import { RoutesPage } from "@/pages/RoutesPage"
 import { useRoutesStore } from "@/stores/routes-store"
 import { useSelectionStore } from "@/stores/selection-store"
+import { useDataStore } from "@/stores/data-store"
 
-const { loadFlightDatasetsMock } = vi.hoisted(() => ({
-  loadFlightDatasetsMock: vi.fn(),
+const { useQDatasetMock } = vi.hoisted(() => ({
+  useQDatasetMock: vi.fn(),
 }))
 
-vi.mock("@/lib/data/datasets", async () => {
-  const actual = await vi.importActual<typeof import("@/lib/data/datasets")>("@/lib/data/datasets")
+vi.mock("@/lib/services/useQDataset", async () => {
+  const actual = await vi.importActual<typeof import("@/lib/services/useQDataset")>("@/lib/services/useQDataset")
   return {
     ...actual,
-    loadFlightDatasets: loadFlightDatasetsMock,
+    useQDataset: useQDatasetMock,
   }
 })
 
 describe("selection to routes integration", () => {
   beforeEach(() => {
-    loadFlightDatasetsMock.mockResolvedValue({
-      world: FIXTURE_WORLD,
-      airports: FIXTURE_AIRPORTS,
-      routes: FIXTURE_ROUTES,
+    useQDatasetMock.mockReturnValue({
+      query: {
+        data: {
+          world: FIXTURE_WORLD,
+          airports: FIXTURE_AIRPORTS,
+          routes: FIXTURE_ROUTES,
+        },
+        isLoading: false,
+      },
     })
 
     useSelectionStore.setState({
-      datasets: null,
-      graph: null,
-      isLoading: false,
-      error: null,
       originCountryCode: null,
       destinationCountryCode: null,
       originId: null,
       destinationId: null,
-      validationMessage: null,
-      canSubmit: false,
     })
+
+    useDataStore.setState({
+      graph: null,
+      countries: [],
+      airportsOptions: {},
+    })
+    useDataStore.getState().seedData(FIXTURE_ROUTES, FIXTURE_AIRPORTS)
 
     useRoutesStore.setState({
       algorithm: "dijkstra",
       computeState: "idle",
       result: null,
       lastInput: {
-        graph: null,
         originId: null,
         destinationId: null,
       },
@@ -57,18 +63,20 @@ describe("selection to routes integration", () => {
   it("hands off selection context and propagates active algorithm result", async () => {
     const user = userEvent.setup()
 
+    useSelectionStore.setState({
+      originCountryCode: "PE",
+      destinationCountryCode: "PE",
+      originId: 1,
+      destinationId: 3,
+    })
+
     render(
       <MemoryRouter initialEntries={["/"]}>
         <App />
       </MemoryRouter>
     )
 
-    await screen.findByText("Flight route planner")
-
-    useSelectionStore.getState().setOriginCountry("PE")
-    useSelectionStore.getState().setDestinationCountry("PE")
-    useSelectionStore.getState().setOrigin(1)
-    useSelectionStore.getState().setDestination(3)
+    await screen.findByText("Flight route selection")
 
     await user.click(screen.getByRole("button", { name: "Calculate route" }))
 
@@ -88,21 +96,13 @@ describe("selection to routes integration", () => {
   })
 
   it("shows routes empty guidance when prerequisites are missing", async () => {
+    useDataStore.getState().seedData(FIXTURE_ROUTES, FIXTURE_AIRPORTS)
+
     useSelectionStore.setState({
-      datasets: {
-        world: FIXTURE_WORLD,
-        airports: FIXTURE_AIRPORTS,
-        routes: FIXTURE_ROUTES,
-      },
-      graph: createFixtureGraph(),
-      isLoading: false,
-      error: null,
       originCountryCode: "PE",
       destinationCountryCode: "PE",
       originId: 1,
       destinationId: 1,
-      validationMessage: "Origin and destination must be different airports.",
-      canSubmit: false,
     })
 
     render(
@@ -114,5 +114,67 @@ describe("selection to routes integration", () => {
     )
 
     expect(screen.getByText("No calculation yet. Choose an algorithm and run a calculation.")).toBeInTheDocument()
+  })
+
+  it("blocks transition when origin is null", async () => {
+    const user = userEvent.setup()
+
+    useSelectionStore.setState({
+      originCountryCode: "PE",
+      destinationCountryCode: "PE",
+      originId: null,
+      destinationId: 3,
+    })
+
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <App />
+      </MemoryRouter>
+    )
+
+    await screen.findByText("Flight route selection")
+
+    const submitButton = screen.getByRole("button", { name: "Calculate route" })
+    expect(submitButton).toBeDisabled()
+
+    await user.click(submitButton)
+
+    expect(screen.getByText("Flight route selection")).toBeInTheDocument()
+    expect(screen.queryByText("Route visualization")).not.toBeInTheDocument()
+    expect(useRoutesStore.getState().lastInput).toEqual({
+      originId: null,
+      destinationId: null,
+    })
+  })
+
+  it("blocks transition when destination is null", async () => {
+    const user = userEvent.setup()
+
+    useSelectionStore.setState({
+      originCountryCode: "PE",
+      destinationCountryCode: "PE",
+      originId: 1,
+      destinationId: null,
+    })
+
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <App />
+      </MemoryRouter>
+    )
+
+    await screen.findByText("Flight route selection")
+
+    const submitButton = screen.getByRole("button", { name: "Calculate route" })
+    expect(submitButton).toBeDisabled()
+
+    await user.click(submitButton)
+
+    expect(screen.getByText("Flight route selection")).toBeInTheDocument()
+    expect(screen.queryByText("Route visualization")).not.toBeInTheDocument()
+    expect(useRoutesStore.getState().lastInput).toEqual({
+      originId: null,
+      destinationId: null,
+    })
   })
 })

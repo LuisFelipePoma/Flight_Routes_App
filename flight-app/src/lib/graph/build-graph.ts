@@ -1,6 +1,6 @@
 import type { FlightGraph, RouteEdge } from "@/lib/types/flight"
-import type { RoutesResponseDTO } from "../services/interfaces/routes.interface";
-import type { AirportResponseDTO } from "../services/interfaces/airports.interface";
+import type { RoutesResponseDTO } from "../services/interfaces/routes.interface"
+import type { AirportResponseDTO } from "../services/interfaces/airports.interface"
 
 const EARTH_RADIUS_KM = 6371
 
@@ -52,26 +52,26 @@ export function buildAdjacencyGraph(routes: RoutesResponseDTO[]): FlightGraph {
     } = route
 
     if (
-      !isFiniteCoordinate(originLat) ||
-      !isFiniteCoordinate(originLon) ||
-      !isFiniteCoordinate(destinationLat) ||
-      !isFiniteCoordinate(destinationLon)
+      !isFiniteCoordinate(Number(originLat)) ||
+      !isFiniteCoordinate(Number(originLon)) ||
+      !isFiniteCoordinate(Number(destinationLat)) ||
+      !isFiniteCoordinate(Number(destinationLon))
     ) {
       continue
     }
 
     const distanceKm = haversine(
-      { lat: originLat, lon: originLon },
-      { lat: destinationLat, lon: destinationLon }
+      { lat: Number(originLat), lon: Number(originLon) },
+      { lat: Number(destinationLat), lon: Number(destinationLon) }
     )
 
-    addEdge(graph, originId, {
-      to: destinationId,
+    addEdge(graph, Number(originId), {
+      to: Number(destinationId),
       distanceKm,
     })
 
-    if (!graph[destinationId]) {
-      graph[destinationId] = []
+    if (!graph[Number(destinationId)]) {
+      graph[Number(destinationId)] = []
     }
   }
 
@@ -85,8 +85,8 @@ export function buildFlightGraph(
   const graph = buildAdjacencyGraph(routes)
 
   for (const airport of airports) {
-    if (!graph[airport.id]) {
-      graph[airport.id] = []
+    if (!graph[Number(airport.id)]) {
+      graph[Number(airport.id)] = []
     }
   }
 

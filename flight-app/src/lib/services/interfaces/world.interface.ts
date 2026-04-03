@@ -10,7 +10,10 @@ export interface Geometry {
   coordinates: Array<Array<number[]>>
 }
 
-export interface WorlResponseDTO {
+export interface WorldResponseDTO {
   type: "FeatureCollection"
   features: WorldFeature[]
 }
+
+// Temporary compatibility alias during migration window.
+export type WorlResponseDTO = WorldResponseDTO

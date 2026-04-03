@@ -1,9 +1,10 @@
-import type { Airport, RouteResult } from "@/lib/types/flight"
+import type { RouteResult } from "@/lib/types/flight"
+import { ScrollArea } from "../ui/scroll-area"
+import type { AirportResponseDTO } from "@/lib/services/interfaces/airports.interface"
 
 interface RouteSummaryProps {
   result: RouteResult | null
-  airportsById?: Record<number, Airport>
-  className?: string
+  airportsById?: Record<number, AirportResponseDTO>
 }
 
 function formatAlgorithmLabel(result: RouteResult | null): string {
@@ -38,7 +39,7 @@ function formatStatusLabel(result: RouteResult | null): string {
   return "Calculation error"
 }
 
-function resolveAirportLabel(id: number, airportsById?: Record<number, Airport>): string {
+function resolveAirportLabel(id: number, airportsById?: Record<number, AirportResponseDTO>): string {
   const airport = airportsById?.[id]
   if (!airport) {
     return `Airport #${id}`
@@ -47,14 +48,14 @@ function resolveAirportLabel(id: number, airportsById?: Record<number, Airport>)
   return `${airport.airport_name} (${airport.city}, ${airport.country_code})`
 }
 
-export function RouteSummary({ result, airportsById, className }: RouteSummaryProps) {
+export function RouteSummary({ result, airportsById }: RouteSummaryProps) {
   const stops = result?.airportIds ?? []
   const stopLabels = stops.map((id) => resolveAirportLabel(id, airportsById))
   const statusText = formatStatusLabel(result)
 
   return (
-    <section
-      className={className}
+    <ScrollArea
+      className="h-full"
       aria-labelledby="route-summary-title"
       aria-live="polite"
       role="status"
@@ -113,7 +114,7 @@ export function RouteSummary({ result, airportsById, className }: RouteSummaryPr
           </p>
         )}
       </div>
-    </section>
+    </ScrollArea>
   )
 }
 

@@ -1,14 +1,15 @@
 import { useQuery } from "@tanstack/react-query"
 import { DATASET_URLS } from "./consts/endpoints"
 import type { AirportResponseDTO } from "./interfaces/airports.interface"
-import type { WorlResponseDTO } from "./interfaces/world.interface"
+import type { WorldResponseDTO } from "./interfaces/world.interface"
 import type { RoutesResponseDTO } from "./interfaces/routes.interface"
 
-interface Response {
+interface DatasetResponse {
   airports: AirportResponseDTO[]
-  world: WorlResponseDTO
+  world: WorldResponseDTO
   routes: RoutesResponseDTO[]
 }
+
 export const useQDataset = () => {
   const query = useQuery({
     queryKey: ["dataset-data"],
@@ -22,7 +23,7 @@ export const useQDataset = () => {
       const airports = await airportsResponse.json()
       const world = await worldResponse.json()
       const routes = await routesResponse.json()
-      return { airports, world, routes } as Response
+      return { airports, world, routes } as DatasetResponse
     },
   })
   return { query }

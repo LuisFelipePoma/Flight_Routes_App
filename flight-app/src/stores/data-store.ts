@@ -2,18 +2,16 @@ import { buildFlightGraph } from "@/lib/graph/build-graph"
 import type { AirportResponseDTO } from "@/lib/services/interfaces/airports.interface"
 import type { RoutesResponseDTO } from "@/lib/services/interfaces/routes.interface"
 import type { SelectionOption } from "@/lib/services/interfaces/types"
-import type { WorlResponseDTO } from "@/lib/services/interfaces/world.interface"
 import type { FlightGraph } from "@/lib/types/flight"
 import { create } from "zustand"
 
 interface DataState {
   graph: FlightGraph | null
   countries: SelectionOption[]
-  airportsOptions: SelectionOption[]
+  airportsOptions: { [key: string]: SelectionOption[] }
 
   seedData: (
     routes: RoutesResponseDTO[],
-    world: WorlResponseDTO,
     airports: AirportResponseDTO[]
   ) => void
 }
@@ -21,8 +19,8 @@ interface DataState {
 export const useDataStore = create<DataState>((set) => ({
   graph: null,
   countries: [],
-  airportsOptions: [],
-  seedData: (routes, world, airports) =>
+  airportsOptions: {},
+  seedData: (routes, airports) =>
     set(() => {
       return {
         graph: buildFlightGraph(airports, routes),
@@ -35,10 +33,19 @@ export const useDataStore = create<DataState>((set) => ({
           }
           return acc
         }, [] as SelectionOption[]),
-        airportsOptions: airports.map((airport) => ({
-          value: airport.id,
-          label: `${airport.airport_name} (${airport.city})`,
-        })) as SelectionOption[],
+        airportsOptions: airports.reduce(
+          (acc, airport) => {
+            if (!acc[airport.country_code]) {
+              acc[airport.country_code] = []
+            }
+            acc[airport.country_code].push({
+              value: airport.id,
+              label: `${airport.airport_name} (${airport.city})`,
+            })
+            return acc
+          },
+          {} as { [key: string]: SelectionOption[] }
+        ),
       }
     }),
 }))
