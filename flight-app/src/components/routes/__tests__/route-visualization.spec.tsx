@@ -1,10 +1,11 @@
 import { render, screen } from "@testing-library/react"
 import { waitFor } from "@testing-library/react"
-import { MemoryRouter } from "react-router-dom"
+import { MemoryRouter, Route, Routes } from "react-router-dom"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import { RouteSummary } from "@/components/routes/RouteSummary"
 import { RoutesPage } from "@/pages/RoutesPage"
+import { RadarShell } from "@/components/shell/RadarShell"
 import { FIXTURE_AIRPORTS, FIXTURE_ROUTES, FIXTURE_WORLD } from "@/test/fixtures/flight-fixtures"
 import type { FlightGraph } from "@/lib/types/flight"
 import { useRoutesStore } from "@/stores/routes-store"
@@ -134,7 +135,11 @@ describe("routes page overlay synchronization", () => {
 
     const { container } = render(
       <MemoryRouter initialEntries={["/routes"]}>
-        <RoutesPage />
+        <Routes>
+          <Route element={<RadarShell />}>
+            <Route path="/routes" element={<RoutesPage />} />
+          </Route>
+        </Routes>
       </MemoryRouter>
     )
 
@@ -176,7 +181,11 @@ describe("routes page overlay synchronization", () => {
 
     const { container } = render(
       <MemoryRouter initialEntries={["/routes"]}>
-        <RoutesPage />
+        <Routes>
+          <Route element={<RadarShell />}>
+            <Route path="/routes" element={<RoutesPage />} />
+          </Route>
+        </Routes>
       </MemoryRouter>
     )
 

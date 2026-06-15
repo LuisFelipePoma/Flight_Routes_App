@@ -76,11 +76,11 @@ describe("selection to routes integration", () => {
       </MemoryRouter>
     )
 
-    await screen.findByText("Flight route selection")
+    await screen.findByText("Route selection")
 
-    await user.click(screen.getByRole("button", { name: "Calculate route" }))
+    await user.click(screen.getByRole("button", { name: "Initiate routing" }))
 
-    await screen.findByText("Route visualization")
+    await screen.findByText("Route computation")
     await waitFor(() => {
       expect(useRoutesStore.getState().result?.status).toBe("ok")
       expect(useRoutesStore.getState().result?.algorithm).toBe("dijkstra")
@@ -132,15 +132,15 @@ describe("selection to routes integration", () => {
       </MemoryRouter>
     )
 
-    await screen.findByText("Flight route selection")
+    await screen.findByText("Route selection")
 
-    const submitButton = screen.getByRole("button", { name: "Calculate route" })
+    const submitButton = screen.getByRole("button", { name: "Initiate routing" })
     expect(submitButton).toBeDisabled()
 
     await user.click(submitButton)
 
-    expect(screen.getByText("Flight route selection")).toBeInTheDocument()
-    expect(screen.queryByText("Route visualization")).not.toBeInTheDocument()
+    expect(screen.getByText("Route selection")).toBeInTheDocument()
+    expect(screen.queryByText("Route computation")).not.toBeInTheDocument()
     expect(useRoutesStore.getState().lastInput).toEqual({
       originId: null,
       destinationId: null,
@@ -163,15 +163,15 @@ describe("selection to routes integration", () => {
       </MemoryRouter>
     )
 
-    await screen.findByText("Flight route selection")
+    await screen.findByText("Route selection")
 
-    const submitButton = screen.getByRole("button", { name: "Calculate route" })
+    const submitButton = screen.getByRole("button", { name: "Initiate routing" })
     expect(submitButton).toBeDisabled()
 
     await user.click(submitButton)
 
-    expect(screen.getByText("Flight route selection")).toBeInTheDocument()
-    expect(screen.queryByText("Route visualization")).not.toBeInTheDocument()
+    expect(screen.getByText("Route selection")).toBeInTheDocument()
+    expect(screen.queryByText("Route computation")).not.toBeInTheDocument()
     expect(useRoutesStore.getState().lastInput).toEqual({
       originId: null,
       destinationId: null,

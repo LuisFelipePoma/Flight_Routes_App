@@ -1,19 +1,18 @@
-import { useNavigate } from "react-router-dom"
-import { GlobeCanvas } from "@/components/globe/GlobeCanvas"
-import { SelectionForm } from "@/components/selection/SelectionForm"
+import { useEffect } from "react"
+import { SelectionConsole } from "@/components/selection/SelectionConsole"
 import { useSelectionStore } from "@/stores/selection-store"
 import { useRoutesStore } from "@/stores/routes-store"
 import { useQDataset } from "@/lib/services/useQDataset"
 import { useDataStore } from "@/stores/data-store"
-import { useEffect } from "react"
+import { useConsoleTransition } from "@/hooks/use-console-transition"
 
 export function SelectionPage() {
-  const navigate = useNavigate()
-  const seedData = useDataStore(s => s.seedData)
+  const seedData = useDataStore((s) => s.seedData)
   const originId = useSelectionStore((state) => state.originId)
   const destinationId = useSelectionStore((state) => state.destinationId)
   const primeContext = useRoutesStore((state) => state.primeContext)
   const clearResult = useRoutesStore((state) => state.clearResult)
+  const { consoleRef, transitionTo } = useConsoleTransition<HTMLDivElement>()
 
   const { data: dataset, isLoading } = useQDataset().query
 
@@ -28,14 +27,11 @@ export function SelectionPage() {
     if (!hasSelectedAirports) {
       return
     }
-
-    primeContext({
-      originId,
-      destinationId,
-    })
+    primeContext({ originId, destinationId })
     clearResult()
-    navigate("/routes")
+    transitionTo("/routes")
   }
+
   useEffect(() => {
     if (dataset) {
       seedData(dataset.routes, dataset.airports)
@@ -43,21 +39,12 @@ export function SelectionPage() {
   }, [dataset, seedData])
 
   return (
-    <main className="h-screen w-screen bg-background px-6 py-8 text-foreground">
-      <section
-        aria-labelledby="selection-page-title"
-        className="grid w-full gap-6 lg:grid-cols-[1.1fr_1fr] h-full"
-      >
-
-        <SelectionForm
-          isLoading={isLoading}
-          validationMessage={validationMessage}
-          onSubmit={handleSubmit}
-        />
-        <GlobeCanvas
-          className="h-full overflow-hidden rounded-lg border border-border"
-        />
-      </section>
-    </main >
+    <div ref={consoleRef} className="h-full min-h-0">
+      <SelectionConsole
+        isLoading={isLoading}
+        validationMessage={validationMessage}
+        onSubmit={handleSubmit}
+      />
+    </div>
   )
 }

@@ -9,6 +9,8 @@ interface DataState {
   graph: FlightGraph | null
   countries: SelectionOption[]
   airportsOptions: { [key: string]: SelectionOption[] }
+  /** Flat airport list, for the searchable picker. */
+  airports: AirportResponseDTO[]
 
   seedData: (
     routes: RoutesResponseDTO[],
@@ -20,10 +22,12 @@ export const useDataStore = create<DataState>((set) => ({
   graph: null,
   countries: [],
   airportsOptions: {},
+  airports: [],
   seedData: (routes, airports) =>
     set(() => {
       return {
         graph: buildFlightGraph(airports, routes),
+        airports,
         countries: airports.reduce((acc, airport) => {
           if (!acc.some((c) => c.value === airport.country_code)) {
             acc.push({

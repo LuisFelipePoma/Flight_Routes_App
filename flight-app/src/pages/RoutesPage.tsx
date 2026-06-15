@@ -1,83 +1,20 @@
 import { useEffect, useMemo } from "react"
-import { useNavigate } from "react-router-dom"
-import { GlobeCanvas, type OverlayArc, type OverlayEndpoint } from "@/components/globe/GlobeCanvas"
+import { ArrowLeft, RefreshCw } from "lucide-react"
 import { RouteSummary } from "@/components/routes/RouteSummary"
+import { AlgorithmSelector } from "@/components/routes/AlgorithmSelector"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type { AlgorithmKey } from "@/lib/types/flight"
 import { useRoutesStore } from "@/stores/routes-store"
 import { useSelectionStore } from "@/stores/selection-store"
 import { useQDataset } from "@/lib/services/useQDataset"
 import type { AirportResponseDTO } from "@/lib/services/interfaces/airports.interface"
 import { useDataStore } from "@/stores/data-store"
-
-const ALGORITHMS: { key: AlgorithmKey; label: string; description: string }[] = [
-  {
-    key: "dijkstra",
-    label: "Dijkstra",
-    description: "Shortest weighted path",
-  },
-  {
-    key: "dfs",
-    label: "DFS",
-    description: "Depth-first traversal path",
-  },
-  {
-    key: "prim",
-    label: "Prim",
-    description: "MST frontier-derived path",
-  },
-]
-
-function toOverlayData(
-  airportIds: number[],
-  airportsById: Map<number, { id: number; lat: number; lon: number }>
-): { arcs: OverlayArc[]; endpoints: OverlayEndpoint[] } {
-  const endpoints = airportIds
-    .map((id, index) => {
-      const airport = airportsById.get(id)
-      if (!airport) {
-        return null
-      }
-
-      const kind =
-        index === 0
-          ? "origin"
-          : index === airportIds.length - 1
-            ? "destination"
-            : "stop"
-
-      return {
-        id: `endpoint-${id}-${index}`,
-        lon: airport.lon,
-        lat: airport.lat,
-        kind,
-      } satisfies OverlayEndpoint
-    })
-    .filter((value) => value !== null)
-
-  const arcs: OverlayArc[] = []
-  for (let index = 0; index < airportIds.length - 1; index += 1) {
-    const from = airportsById.get(airportIds[index])
-    const to = airportsById.get(airportIds[index + 1])
-    if (!from || !to) {
-      continue
-    }
-
-    arcs.push({
-      id: `arc-${from.id}-${to.id}-${index}`,
-      from: [from.lon, from.lat],
-      to: [to.lon, to.lat],
-    })
-  }
-
-  return { arcs, endpoints }
-}
+import { useConsoleTransition } from "@/hooks/use-console-transition"
+import { useRevealSequence } from "@/hooks/use-reveal-sequence"
 
 export function RoutesPage() {
-  const navigate = useNavigate()
   const { data: datasets } = useQDataset().query
-  const graph = useDataStore(s => s.graph)
+  const graph = useDataStore((s) => s.graph)
   const originId = useSelectionStore((state) => state.originId)
   const destinationId = useSelectionStore((state) => state.destinationId)
   const algorithm = useRoutesStore((state) => state.algorithm)
@@ -87,6 +24,10 @@ export function RoutesPage() {
   const primeContext = useRoutesStore((state) => state.primeContext)
   const computeRoute = useRoutesStore((state) => state.computeRoute)
   const clearResult = useRoutesStore((state) => state.clearResult)
+
+  const { consoleRef, transitionTo } = useConsoleTransition<HTMLDivElement>()
+  const revealRef = useRevealSequence<HTMLDivElement>()
+
   useEffect(() => {
     primeContext({ originId, destinationId })
   }, [destinationId, originId, primeContext])
@@ -103,32 +44,6 @@ export function RoutesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const airportsById = useMemo(
-    () =>
-      new Map(
-        (datasets?.airports ?? []).map((airport) => [
-          Number(airport.id),
-          {
-            id: Number(airport.id),
-            lat: parseFloat(airport.lat),
-            lon: parseFloat(airport.lon),
-          },
-        ])
-      ),
-    [datasets]
-  )
-
-  const overlays = useMemo(() => {
-    if (!result || result.status !== "ok" || result.airportIds.length === 0) {
-      return {
-        arcs: [],
-        endpoints: [],
-      }
-    }
-
-    return toOverlayData(result.airportIds, airportsById)
-  }, [airportsById, result])
-
   const airportsRecord = useMemo(
     () =>
       (datasets?.airports ?? []).reduce<Record<number, AirportResponseDTO>>(
@@ -141,7 +56,11 @@ export function RoutesPage() {
     [datasets]
   )
 
-  const hasPrerequisites = graph !== null && originId !== null && destinationId !== null && originId !== destinationId
+  const hasPrerequisites =
+    graph !== null &&
+    originId !== null &&
+    destinationId !== null &&
+    originId !== destinationId
 
   const handleAlgorithmChange = (next: AlgorithmKey) => {
     setAlgorithm(next)
@@ -160,87 +79,70 @@ export function RoutesPage() {
 
   const handleBackToSelection = () => {
     clearResult()
-    navigate("/")
+    transitionTo("/")
   }
 
   return (
-    <main className="h-screen w-screen bg-background px-6 py-8 text-foreground">
+    <div ref={consoleRef} className="h-full min-h-0">
       <section
-        className="grid w-full gap-6 lg:grid-cols-[1.2fr_1fr] h-full"
+        ref={revealRef}
         aria-labelledby="routes-page-title"
+        className="grid h-full min-h-0 grid-rows-[auto_auto_1fr_auto] gap-4 p-5"
       >
-        <Card>
-          <CardHeader>
-            <CardTitle id="routes-page-title">Route visualization</CardTitle>
-          </CardHeader>
-          <CardContent className="grid grid-rows-[1fr_8fr_1fr] gap-4 h-full">
-            <section className="flex flex-col gap-2">
-              <div className="flex flex-wrap gap-2" role="group" aria-label="Algorithm selector">
-                {ALGORITHMS.map((item) => (
-                  <Button
-                    key={item.key}
-                    type="button"
-                    variant={algorithm === item.key ? "default" : "outline"}
-                    onClick={() => handleAlgorithmChange(item.key)}
-                    aria-pressed={algorithm === item.key}
-                  >
-                    {item.label}
-                  </Button>
-                ))}
-              </div>
+        <header data-reveal className="shrink-0">
+          <h1 id="routes-page-title" className="text-lg text-primary [text-shadow:var(--shadow-glow-green)]">
+            Route computation
+          </h1>
+          <p className="mt-1 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+            Select pathfinding mode · scope renders live
+          </p>
+        </header>
 
-              <p className="text-sm text-muted-foreground">
-                {ALGORITHMS.find((item) => item.key === algorithm)?.description}
-              </p>
-            </section>
+        <div data-reveal>
+          <AlgorithmSelector
+            algorithm={algorithm}
+            onChange={handleAlgorithmChange}
+            disabled={computeState === "computing"}
+          />
+        </div>
 
-            <section className="h-full overflow-hidden rounded-lg border border-border bg-background">
-              <GlobeCanvas
-                overlayArcs={overlays.arcs}
-                overlayEndpoints={overlays.endpoints}
-                className="h-full"
-              />
-            </section>
+        <div data-reveal className="min-h-0 overflow-hidden rounded-sm border border-border bg-card/40 p-3">
+          {result?.status === "no-route" ? (
+            <p role="status" className="mb-2 font-mono text-[11px] text-accent">
+              No route exists between the selected airports for the active algorithm.
+            </p>
+          ) : null}
 
-            <section className="flex flex-col">
-              {result?.status === "no-route" ? (
-                <p role="status" className="text-sm text-muted-foreground">
-                  No route exists between the selected airports for the active algorithm.
-                </p>
-              ) : null}
-
-              {!result ? (
-                <p role="status" className="text-sm text-muted-foreground">
-                  No calculation yet. Choose an algorithm and run a calculation.
-                </p>
-              ) : null}
-
-              <div className="flex flex-wrap items-center gap-2">
-                <Button
-                  type="button"
-                  onClick={handleRecalculate}
-                  disabled={!hasPrerequisites || computeState === "computing"}
-                >
-                  {computeState === "computing" ? "Calculating..." : "Recalculate route"}
-                </Button>
-                <Button type="button" variant="outline" onClick={handleBackToSelection}>
-                  Back to selection
-                </Button>
-
-              </div>
-            </section>
-          </CardContent>
-        </Card>
-
-        <Card className="h-full">
-          <CardHeader>
-            <CardTitle>Accessible route details</CardTitle>
-          </CardHeader>
-          <CardContent className="h-full">
+          {!result ? (
+            <p role="status" className="font-mono text-[11px] text-muted-foreground">
+              No calculation yet. Choose an algorithm and run a calculation.
+            </p>
+          ) : (
             <RouteSummary result={result} airportsById={airportsRecord} />
-          </CardContent>
-        </Card>
+          )}
+        </div>
+
+        <div data-reveal className="flex shrink-0 items-center gap-2">
+          <Button
+            type="button"
+            onClick={handleRecalculate}
+            disabled={!hasPrerequisites || computeState === "computing"}
+            className="font-display text-xs tracking-[0.16em]"
+          >
+            <RefreshCw className="size-3.5" />
+            {computeState === "computing" ? "Computing…" : "Recompute"}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleBackToSelection}
+            className="font-display text-xs tracking-[0.16em]"
+          >
+            <ArrowLeft className="size-3.5" />
+            Back to selection
+          </Button>
+        </div>
       </section>
-    </main>
+    </div>
   )
 }
