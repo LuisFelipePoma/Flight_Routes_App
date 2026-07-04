@@ -4,20 +4,19 @@ import { GlobeCanvas } from "@/components/globe/GlobeCanvas"
 import { HudHeader } from "./HudHeader"
 import { HudFrame } from "./HudFrame"
 import { StatusBar } from "./StatusBar"
-import { CrtOverlay } from "./CrtOverlay"
 import { useRouteOverlays } from "@/hooks/use-route-overlays"
+import { useSelectionStore } from "@/stores/selection-store"
 
 /**
- * Persistent cockpit shell. The radar scope (D3 globe) lives here so it
- * survives navigation between the selection and routes consoles — its
- * rotation and the radar sweep never reset. The left column swaps content
- * via <Outlet/>.
+ * Persistent app shell. The D3 globe lives here so map rotation and route
+ * overlays stay stable while the planner panel updates.
  */
 export function RadarShell() {
   const scopeRef = useRef<HTMLDivElement | null>(null)
   const [size, setSize] = useState({ width: 560, height: 520 })
   const [hoveredCode, setHoveredCode] = useState<string | null>(null)
   const overlays = useRouteOverlays()
+  const activeRole = useSelectionStore((s) => s.activeRole)
 
   useEffect(() => {
     const node = scopeRef.current
@@ -40,13 +39,13 @@ export function RadarShell() {
     <div className="grid h-dvh w-screen grid-rows-[auto_1fr_auto] overflow-hidden bg-background text-foreground">
       <HudHeader />
 
-      <div className="grid min-h-0 grid-cols-1 lg:grid-cols-[420px_1fr]">
-        {/* Operator console (per-view) */}
+      <div className="grid min-h-0 grid-rows-[minmax(0,0.58fr)_minmax(0,0.42fr)] lg:grid-cols-[520px_1fr] lg:grid-rows-1">
+        {/* Planner panel */}
         <div className="min-h-0 overflow-hidden border-r border-border bg-card/30">
           <Outlet />
         </div>
 
-        {/* Persistent radar scope */}
+        {/* Persistent map */}
         <div className="relative min-h-0 bg-background">
           <HudFrame>
             <div ref={scopeRef} className="h-full w-full">
@@ -56,6 +55,7 @@ export function RadarShell() {
                 overlayArcs={overlays.arcs}
                 overlayEndpoints={overlays.endpoints}
                 arcsSignature={overlays.signature}
+                activeRole={activeRole}
                 onCountryHover={setHoveredCode}
                 className="h-full w-full"
               />
@@ -65,8 +65,6 @@ export function RadarShell() {
       </div>
 
       <StatusBar hoveredCode={hoveredCode} />
-
-      <CrtOverlay />
     </div>
   )
 }

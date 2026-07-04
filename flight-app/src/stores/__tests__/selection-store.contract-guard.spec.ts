@@ -19,6 +19,7 @@ type HasLegacySelectionActionKeys =
 describe("selection-store contract guard", () => {
   it("exposes current selection state/actions and no legacy API", () => {
     expectTypeOf<SelectionState>().toMatchTypeOf<{
+      activeRole: "origin" | "destination"
       originCountryCode: string | null
       destinationCountryCode: string | null
       originId: number | null
@@ -26,6 +27,7 @@ describe("selection-store contract guard", () => {
     }>()
 
     expectTypeOf<SelectionActions>().toMatchTypeOf<{
+      setActiveRole: (role: "origin" | "destination") => void
       setOriginCountry: (countryCode: string | null) => void
       setDestinationCountry: (countryCode: string | null) => void
       selectCountryFromMap: (countryCode: string) => void

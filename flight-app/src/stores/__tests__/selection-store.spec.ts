@@ -14,6 +14,7 @@ describe("selection-store scenarios", () => {
     useSelectionStore.getState().setDestination(2)
 
     const state = useSelectionStore.getState()
+    expect(state.activeRole).toBe("origin")
     expect(state.originCountryCode).toBe("PE")
     expect(state.destinationCountryCode).toBe("PE")
     expect(state.originId).toBe(1)
@@ -34,6 +35,7 @@ describe("selection-store scenarios", () => {
   it("resets to canonical initial selection state", () => {
     useSelectionStore.getState().setOriginCountry("PE")
     useSelectionStore.getState().setDestinationCountry("CO")
+    useSelectionStore.getState().setActiveRole("destination")
     useSelectionStore.getState().setOrigin(1)
     useSelectionStore.getState().setDestination(10)
 

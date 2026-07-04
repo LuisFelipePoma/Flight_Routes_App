@@ -1,9 +1,11 @@
+import { useEffect, useRef } from "react"
 import type { RouteResult } from "@/lib/types/flight"
 import { ScrollArea } from "../ui/scroll-area"
 import type { AirportResponseDTO } from "@/lib/services/interfaces/airports.interface"
 import { haversine } from "@/lib/graph/build-graph"
 import { DistanceCounter } from "./DistanceCounter"
 import { cn } from "@/lib/utils"
+import { animate, motionEnabled } from "@/lib/anim/motion"
 
 interface RouteSummaryProps {
   result: RouteResult | null
@@ -55,15 +57,38 @@ function legDistance(
 
 export function RouteSummary({ result, airportsById }: RouteSummaryProps) {
   const stops = result?.airportIds ?? []
+  const visibleStops = stops.slice(0, 12)
+  const hiddenStopCount = Math.max(stops.length - visibleStops.length, 0)
   const statusText = formatStatusLabel(result)
+  const contentRef = useRef<HTMLDivElement | null>(null)
+  const resultSignature = result
+    ? `${result.algorithm}:${result.status}:${stops.join("-")}`
+    : "empty"
+
+  useEffect(() => {
+    const node = contentRef.current
+    if (!node || !motionEnabled()) {
+      return
+    }
+    const animation = animate(node, {
+      opacity: [0.72, 1],
+      translateY: [10, 0],
+      duration: 320,
+      ease: "outExpo",
+    })
+    return () => {
+      animation.cancel()
+    }
+  }, [resultSignature])
 
   return (
     <ScrollArea
-      className="h-full"
+      className="h-full min-h-0 overflow-hidden"
       aria-labelledby="route-summary-title"
       aria-live="polite"
       role="status"
     >
+      <div ref={contentRef} className="min-h-0 pr-1">
       <div className="flex items-center justify-between border-b border-border pb-2">
         <h2 id="route-summary-title" className="font-display text-sm tracking-[0.18em] text-foreground">
           Route summary
@@ -112,9 +137,9 @@ export function RouteSummary({ result, airportsById }: RouteSummaryProps) {
         <h3 className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
           Route sequence
         </h3>
-        {stops.length > 0 ? (
+        {visibleStops.length > 0 ? (
           <ol className="mt-2 flex flex-col gap-1">
-            {stops.map((id, index) => {
+            {visibleStops.map((id, index) => {
               const airport = airportsById?.[id]
               const leg = index > 0 ? legDistance(stops[index - 1], id, airportsById) : null
               return (
@@ -139,12 +164,18 @@ export function RouteSummary({ result, airportsById }: RouteSummaryProps) {
                 </li>
               )
             })}
+            {hiddenStopCount > 0 ? (
+              <li className="rounded-sm border border-dashed border-border px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                +{hiddenStopCount} more stops
+              </li>
+            ) : null}
           </ol>
         ) : (
           <p className="mt-2 font-mono text-[11px] text-muted-foreground">
             No stops to display. Run a calculation to view route details.
           </p>
         )}
+      </div>
       </div>
     </ScrollArea>
   )

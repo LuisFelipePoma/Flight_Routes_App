@@ -1,5 +1,4 @@
 import { useMemo } from "react"
-import { useLocation } from "react-router-dom"
 import type { OverlayArc, OverlayEndpoint } from "@/components/globe/GlobeCanvas"
 import type { AirportResponseDTO } from "@/lib/services/interfaces/airports.interface"
 import { useQDataset } from "@/lib/services/useQDataset"
@@ -58,11 +57,9 @@ function buildOverlays(
 
 /**
  * Derives globe overlay geometry from the active route result.
- * Returns empty overlays anywhere but `/routes` so the selection view
- * shows a clean scope.
+ * Single-page flow: result presence owns the scope overlays.
  */
 export function useRouteOverlays(): RouteOverlays {
-  const { pathname } = useLocation()
   const { data: dataset } = useQDataset().query
   const result = useRoutesStore((state) => state.result)
 
@@ -75,12 +72,9 @@ export function useRouteOverlays(): RouteOverlays {
   )
 
   return useMemo(() => {
-    if (pathname !== "/routes") {
-      return EMPTY
-    }
     if (!result || result.status !== "ok" || result.airportIds.length === 0) {
       return EMPTY
     }
     return buildOverlays(result.airportIds, airportsById)
-  }, [pathname, result, airportsById])
+  }, [result, airportsById])
 }

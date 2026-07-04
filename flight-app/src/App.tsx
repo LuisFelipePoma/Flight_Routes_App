@@ -1,15 +1,14 @@
 import { Navigate, Route, Routes } from "react-router-dom"
 import { RadarShell } from "@/components/shell/RadarShell"
-import { RoutesPage } from "@/pages/RoutesPage"
-import { SelectionPage } from "@/pages/SelectionPage"
+import { FlightPlannerPage } from "@/pages/FlightPlannerPage"
 
 export function App() {
   return (
     <Routes>
       <Route element={<RadarShell />}>
-        <Route path="/" element={<SelectionPage />} />
-        <Route path="/routes" element={<RoutesPage />} />
+        <Route path="/" element={<FlightPlannerPage />} />
       </Route>
+      <Route path="/routes" element={<Navigate to="/" replace />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

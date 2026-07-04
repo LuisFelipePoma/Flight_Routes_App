@@ -20,7 +20,7 @@ export function AlgorithmSelector({ algorithm, onChange, disabled }: AlgorithmSe
 
   return (
     <section className="flex flex-col gap-2" aria-label="Algorithm selector">
-      <div className="flex flex-col gap-1.5" role="group">
+      <div className="grid grid-cols-3 gap-1.5" role="group">
         {ALGORITHMS.map((item, index) => {
           const isActive = item.key === algorithm
           return (
@@ -32,7 +32,7 @@ export function AlgorithmSelector({ algorithm, onChange, disabled }: AlgorithmSe
               disabled={disabled}
               onClick={() => onChange(item.key)}
               className={cn(
-                "relative flex items-center gap-3 overflow-hidden rounded-sm border px-3 py-2 text-left transition-all outline-none",
+                "relative flex min-w-0 flex-col gap-1 overflow-hidden rounded-sm border px-3 py-2 text-left transition-all outline-none",
                 "focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50",
                 isActive
                   ? "border-primary/70 bg-primary/10 shadow-glow-green"
@@ -46,12 +46,12 @@ export function AlgorithmSelector({ algorithm, onChange, disabled }: AlgorithmSe
                 )}
                 aria-hidden
               />
-              <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
                 MODE {index + 1}
               </span>
               <span
                 className={cn(
-                  "font-display text-xs tracking-[0.18em]",
+                  "truncate font-display text-xs tracking-[0.08em]",
                   isActive ? "text-primary" : "text-foreground/80"
                 )}
               >

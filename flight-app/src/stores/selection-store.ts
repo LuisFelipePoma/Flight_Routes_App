@@ -1,6 +1,9 @@
 import { create } from "zustand"
 
+export type SelectionRole = "origin" | "destination"
+
 export interface SelectionState {
+  activeRole: SelectionRole
   originCountryCode: string | null
   destinationCountryCode: string | null
   originId: number | null
@@ -8,6 +11,7 @@ export interface SelectionState {
 }
 
 export interface SelectionActions {
+  setActiveRole: (role: SelectionRole) => void
   setOriginCountry: (countryCode: string | null) => void
   setDestinationCountry: (countryCode: string | null) => void
   selectCountryFromMap: (countryCode: string) => void
@@ -19,6 +23,7 @@ export interface SelectionActions {
 type SelectionStore = SelectionState & SelectionActions
 
 export const INITIAL_SELECTION_STATE: SelectionState = {
+  activeRole: "origin",
   originCountryCode: null,
   destinationCountryCode: null,
   originId: null,
@@ -28,34 +33,44 @@ export const INITIAL_SELECTION_STATE: SelectionState = {
 export const useSelectionStore = create<SelectionStore>((set) => ({
   ...INITIAL_SELECTION_STATE,
 
+  setActiveRole(role) {
+    set({ activeRole: role })
+  },
+
   setOriginCountry(countryCode) {
-    set(() => ({
+    set((state) => ({
       originCountryCode: countryCode,
+      originId:
+        state.originCountryCode === countryCode ? state.originId : null,
     }))
   },
 
   setDestinationCountry(countryCode) {
-    set(() => ({
+    set((state) => ({
       destinationCountryCode: countryCode,
+      destinationId:
+        state.destinationCountryCode === countryCode
+          ? state.destinationId
+          : null,
     }))
   },
 
   selectCountryFromMap(countryCode) {
     set((state) => {
-      if (!state.originCountryCode) {
+      if (state.activeRole === "origin") {
         return {
           originCountryCode: countryCode,
+          originId:
+            state.originCountryCode === countryCode ? state.originId : null,
         }
       }
 
-      if (!state.destinationCountryCode) {
-        return {
-          destinationCountryCode: countryCode,
-        }
-      }
       return {
-        originCountryCode: countryCode,
-        destinationCountryCode: null,
+        destinationCountryCode: countryCode,
+        destinationId:
+          state.destinationCountryCode === countryCode
+            ? state.destinationId
+            : null,
       }
     })
   },

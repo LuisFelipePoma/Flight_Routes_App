@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react"
+import { animate, motionEnabled } from "@/lib/anim/motion"
 import { cn } from "@/lib/utils"
 import type { AirportResponseDTO } from "@/lib/services/interfaces/airports.interface"
 
@@ -10,8 +12,8 @@ interface FlightStripProps {
 }
 
 const ROLE_META = {
-  origin: { tag: "ORIG", hint: "O", accent: "text-primary", bar: "bg-primary", glow: "shadow-glow-green" },
-  destination: { tag: "DEST", hint: "D", accent: "text-accent", bar: "bg-accent", glow: "shadow-glow-amber" },
+  origin: { tag: "FROM", accent: "text-primary", bar: "bg-primary", glow: "shadow-glow-green" },
+  destination: { tag: "TO", accent: "text-accent", bar: "bg-accent", glow: "shadow-glow-amber" },
 } as const
 
 function fmtCoord(value: string, axis: "lat" | "lon"): string {
@@ -23,9 +25,26 @@ function fmtCoord(value: string, axis: "lat" | "lon"): string {
 
 export function FlightStrip({ role, airport, active, invalid, onActivate }: FlightStripProps) {
   const meta = ROLE_META[role]
+  const buttonRef = useRef<HTMLButtonElement | null>(null)
+
+  useEffect(() => {
+    const node = buttonRef.current
+    if (!node || !airport || !motionEnabled()) {
+      return
+    }
+    const animation = animate(node, {
+      scale: [1, 1.012, 1],
+      duration: 260,
+      ease: "outExpo",
+    })
+    return () => {
+      animation.cancel()
+    }
+  }, [airport])
 
   return (
     <button
+      ref={buttonRef}
       type="button"
       onClick={onActivate}
       aria-pressed={active}
@@ -43,9 +62,6 @@ export function FlightStrip({ role, airport, active, invalid, onActivate }: Flig
       <div className="flex w-full flex-col gap-1 pl-1">
         <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
           <span className={meta.accent}>{meta.tag}</span>
-          <span className="rounded-xs border border-border px-1 text-muted-foreground">
-            KEY {meta.hint}
-          </span>
         </div>
 
         {airport ? (

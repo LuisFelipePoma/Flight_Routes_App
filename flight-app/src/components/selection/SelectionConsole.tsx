@@ -77,11 +77,11 @@ export function SelectionConsole({
   const handlePick = (airport: AirportResponseDTO) => {
     const id = Number(airport.id)
     if (activeRole === "origin") {
-      setOrigin(id)
       setOriginCountry(airport.country_code)
+      setOrigin(id)
     } else if (activeRole === "destination") {
-      setDestination(id)
       setDestinationCountry(airport.country_code)
+      setDestination(id)
     }
     setActiveRole(null)
   }

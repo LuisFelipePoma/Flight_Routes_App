@@ -1,15 +1,13 @@
 import { render, screen } from "@testing-library/react"
 import { waitFor } from "@testing-library/react"
-import { MemoryRouter, Route, Routes } from "react-router-dom"
+import { MemoryRouter } from "react-router-dom"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
+import { App } from "@/App"
 import { RouteSummary } from "@/components/routes/RouteSummary"
-import { RoutesPage } from "@/pages/RoutesPage"
-import { RadarShell } from "@/components/shell/RadarShell"
 import { FIXTURE_AIRPORTS, FIXTURE_ROUTES, FIXTURE_WORLD } from "@/test/fixtures/flight-fixtures"
-import type { FlightGraph } from "@/lib/types/flight"
 import { useRoutesStore } from "@/stores/routes-store"
-import { useSelectionStore } from "@/stores/selection-store"
+import { INITIAL_SELECTION_STATE, useSelectionStore } from "@/stores/selection-store"
 import { useDataStore } from "@/stores/data-store"
 
 const { useQDatasetMock } = vi.hoisted(() => ({
@@ -33,6 +31,23 @@ beforeEach(() => {
         routes: FIXTURE_ROUTES,
       },
       isLoading: false,
+    },
+  })
+
+  useSelectionStore.setState(INITIAL_SELECTION_STATE)
+  useDataStore.setState({
+    graph: null,
+    countries: [],
+    airportsOptions: {},
+    airports: [],
+  })
+  useRoutesStore.setState({
+    algorithm: "dijkstra",
+    computeState: "idle",
+    result: null,
+    lastInput: {
+      originId: null,
+      destinationId: null,
     },
   })
 })
@@ -102,21 +117,10 @@ describe("route-visualization scenarios", () => {
   })
 })
 
-describe("routes page overlay synchronization", () => {
+describe("single-page overlay synchronization", () => {
   it("draws route arcs and endpoint nodes for successful results", async () => {
-    const graph: FlightGraph = {
-      1: [{ to: 2, distanceKm: 2 }],
-      2: [{ to: 3, distanceKm: 2 }],
-      3: [],
-    }
-
-    useDataStore.setState({
-      graph,
-      countries: [],
-      airportsOptions: {},
-    })
-
     useSelectionStore.setState({
+      activeRole: "origin",
       originCountryCode: "PE",
       destinationCountryCode: "PE",
       originId: 1,
@@ -134,12 +138,8 @@ describe("routes page overlay synchronization", () => {
     })
 
     const { container } = render(
-      <MemoryRouter initialEntries={["/routes"]}>
-        <Routes>
-          <Route element={<RadarShell />}>
-            <Route path="/routes" element={<RoutesPage />} />
-          </Route>
-        </Routes>
+      <MemoryRouter initialEntries={["/"]}>
+        <App />
       </MemoryRouter>
     )
 
@@ -150,19 +150,19 @@ describe("routes page overlay synchronization", () => {
   })
 
   it("clears stale overlays when no route is available", async () => {
-    const disconnected: FlightGraph = {
-      1: [{ to: 2, distanceKm: 1 }],
-      2: [],
-      3: [],
-    }
-
-    useDataStore.setState({
-      graph: disconnected,
-      countries: [],
-      airportsOptions: {},
+    useQDatasetMock.mockReturnValue({
+      query: {
+        data: {
+          world: FIXTURE_WORLD,
+          airports: FIXTURE_AIRPORTS,
+          routes: [FIXTURE_ROUTES[0]],
+        },
+        isLoading: false,
+      },
     })
 
     useSelectionStore.setState({
+      activeRole: "origin",
       originCountryCode: "PE",
       destinationCountryCode: "PE",
       originId: 1,
@@ -180,17 +180,13 @@ describe("routes page overlay synchronization", () => {
     })
 
     const { container } = render(
-      <MemoryRouter initialEntries={["/routes"]}>
-        <Routes>
-          <Route element={<RadarShell />}>
-            <Route path="/routes" element={<RoutesPage />} />
-          </Route>
-        </Routes>
+      <MemoryRouter initialEntries={["/"]}>
+        <App />
       </MemoryRouter>
     )
 
     await waitFor(() => {
-      expect(screen.getByText("No route exists between the selected airports for the active algorithm.")).toBeInTheDocument()
+      expect(screen.getByText("No route available for the selected airports.")).toBeInTheDocument()
       expect(container.querySelectorAll("path.route-arc").length).toBe(0)
     })
   })

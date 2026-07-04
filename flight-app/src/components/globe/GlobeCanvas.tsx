@@ -9,6 +9,7 @@ import {
 } from "d3"
 import type { FeatureCollection, GeoJsonProperties, Geometry } from "geojson"
 import { useSelectionStore } from "@/stores/selection-store"
+import type { SelectionRole } from "@/stores/selection-store"
 import { useQDataset } from "@/lib/services/useQDataset"
 import { useShallow } from "zustand/shallow"
 import { animate, createDrawable, motionEnabled } from "@/lib/anim/motion"
@@ -35,6 +36,8 @@ interface GlobeCanvasProps {
   overlayEndpoints?: OverlayEndpoint[]
   /** Changes whenever the drawn route changes; drives the draw-on animation. */
   arcsSignature?: string
+  /** Current side that receives map country clicks. */
+  activeRole?: SelectionRole
   /** Reports the ISO code of the currently hovered country (or null). */
   onCountryHover?: (code: string | null) => void
 }
@@ -42,6 +45,7 @@ interface GlobeCanvasProps {
 const DEFAULT_WIDTH = 560
 const DEFAULT_HEIGHT = 520
 const DRAG_SENSITIVITY = 0.4
+const DEG_TO_RAD = Math.PI / 180
 
 function getCountryCodeFromFeature(feature: unknown): string | null {
   if (!feature || typeof feature !== "object") {
@@ -54,6 +58,22 @@ function getCountryCodeFromFeature(feature: unknown): string | null {
   return null
 }
 
+function isCoordinateOnVisibleHemisphere(
+  lon: number,
+  lat: number,
+  rotation: [number, number, number]
+): boolean {
+  const centerLon = -rotation[0] * DEG_TO_RAD
+  const centerLat = -rotation[1] * DEG_TO_RAD
+  const lonRad = lon * DEG_TO_RAD
+  const latRad = lat * DEG_TO_RAD
+  const cosDistance =
+    Math.sin(centerLat) * Math.sin(latRad) +
+    Math.cos(centerLat) * Math.cos(latRad) * Math.cos(lonRad - centerLon)
+
+  return cosDistance > 0
+}
+
 export function GlobeCanvas({
   width = DEFAULT_WIDTH,
   height = DEFAULT_HEIGHT,
@@ -61,6 +81,7 @@ export function GlobeCanvas({
   overlayArcs = [],
   overlayEndpoints = [],
   arcsSignature = "",
+  activeRole = "origin",
   onCountryHover,
 }: GlobeCanvasProps) {
   const { data: dataset } = useQDataset().query
@@ -105,7 +126,11 @@ export function GlobeCanvas({
       .attr("height", height)
       .attr("viewBox", `0 0 ${width} ${height}`)
       .attr("role", "img")
-      .attr("aria-label", "Radar scope for country and route visualization")
+      .attr(
+        "aria-label",
+        `Radar scope. Country clicks assign the active ${activeRole}.`
+      )
+      .attr("data-active-role", activeRole)
       .attr("class", "block h-full w-full")
 
     if (!dataset?.world) {
@@ -136,6 +161,22 @@ export function GlobeCanvas({
     const graticule = geoGraticule()
     let rotation = projection.rotate() as [number, number, number]
 
+    const placeEndpoint = (endpoint: OverlayEndpoint) => {
+      const projected = projection([endpoint.lon, endpoint.lat])
+      const visible =
+        projected !== null &&
+        isCoordinateOnVisibleHemisphere(endpoint.lon, endpoint.lat, rotation) &&
+        projected[0] >= -12 &&
+        projected[0] <= width + 12 &&
+        projected[1] >= -12 &&
+        projected[1] <= height + 12
+
+      return {
+        transform: projected ? `translate(${projected[0]},${projected[1]})` : "translate(-999,-999)",
+        visible,
+      }
+    }
+
     // ---- defs: ocean gradient, phosphor glow, sweep gradient, sphere clip ----
     const defs = svg.append("defs")
 
@@ -162,6 +203,11 @@ export function GlobeCanvas({
     glowMerge.append("feMergeNode").attr("in", "blur")
     glowMerge.append("feMergeNode").attr("in", "SourceGraphic")
 
+    const scopeClip = defs.append("clipPath").attr("id", "scope-clip")
+    scopeClip
+      .append("path")
+      .attr("d", pathGenerator({ type: "Sphere" } as never) ?? "")
+
     // ---- layers ----
     const sphereGroup = svg.append("g").attr("data-layer", "sphere")
     const globeGroup = svg.append("g").attr("data-layer", "globe")
@@ -172,6 +218,7 @@ export function GlobeCanvas({
     const endpointGroup = svg
       .append("g")
       .attr("data-layer", "endpoints")
+      .attr("clip-path", "url(#scope-clip)")
       .attr("filter", "url(#phosphor-glow)")
 
     // Sphere (ocean) + rim
@@ -248,6 +295,23 @@ export function GlobeCanvas({
         onCountryHover?.(null)
       })
 
+    if (motionEnabled()) {
+      const selectedCountries = countryPaths
+        .filter((feature) => {
+          const code = getCountryCodeFromFeature(feature)
+          return code === originCode || code === destinationCode
+        })
+        .nodes()
+
+      if (selectedCountries.length > 0) {
+        animate(selectedCountries, {
+          opacity: [0.55, 1],
+          duration: 280,
+          ease: "outExpo",
+        })
+      }
+    }
+
     // Arcs
     const arcSelection = arcGroup
       .selectAll<SVGPathElement, (typeof normalizedArcs)[number]>("path.route-arc")
@@ -269,11 +333,9 @@ export function GlobeCanvas({
       .attr("class", "endpoint")
       .attr("data-kind", (endpoint) => endpoint.kind ?? "stop")
       .attr("transform", (endpoint) => {
-        const projected = projection([endpoint.lon, endpoint.lat])
-        return projected
-          ? `translate(${projected[0]},${projected[1]})`
-          : "translate(-999,-999)"
+        return placeEndpoint(endpoint).transform
       })
+      .style("display", (endpoint) => (placeEndpoint(endpoint).visible ? null : "none"))
 
     endpoints.each(function (endpoint) {
       const g = select(this)
@@ -362,6 +424,7 @@ export function GlobeCanvas({
     const updateProjectedLayers = () => {
       const spherePath = pathGenerator({ type: "Sphere" } as never) ?? ""
       sphereGroup.select<SVGPathElement>("path.scope-sphere").attr("d", spherePath)
+      scopeClip.select<SVGPathElement>("path").attr("d", spherePath)
       countryPaths.attr("d", (feature) => pathGenerator(feature as never) ?? "")
       globeGroup
         .select<SVGPathElement>("path.graticule")
@@ -372,11 +435,9 @@ export function GlobeCanvas({
       endpointGroup
         .selectAll<SVGGElement, OverlayEndpoint>("g.endpoint")
         .attr("transform", (endpoint) => {
-          const projected = projection([endpoint.lon, endpoint.lat])
-          return projected
-            ? `translate(${projected[0]},${projected[1]})`
-            : "translate(-999,-999)"
+          return placeEndpoint(endpoint).transform
         })
+        .style("display", (endpoint) => (placeEndpoint(endpoint).visible ? null : "none"))
     }
 
     const dragBehavior = drag<SVGSVGElement, unknown>().on(
@@ -417,6 +478,7 @@ export function GlobeCanvas({
     normalizedArcs,
     overlayEndpoints,
     arcsSignature,
+    activeRole,
     originCountryCode,
     destinationCountryCode,
     onCountrySelect,

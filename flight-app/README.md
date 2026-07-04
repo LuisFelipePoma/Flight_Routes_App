@@ -1,8 +1,8 @@
-# PHOSPHOR TRACON — Flight Routes
+# Flight Routes
 
-An interactive flight-route pathfinder rendered as a control-tower radar console.
-A persistent D3 orthographic globe (the "scope") shows airports and computed
-routes, while ATC-style flight strips drive origin/destination selection.
+An interactive flight-route pathfinder with a persistent D3 orthographic globe.
+The map shows countries and computed routes, while a single planner panel drives
+origin/destination selection.
 Routes are computed client-side with Dijkstra, DFS, or Prim over a haversine
 distance graph.
 
@@ -43,7 +43,7 @@ Components land in `src/components/ui`.
 
 ## Notes
 
-- Dark-only CRT theme. All animations are gated behind a reduced-motion check,
+- Dark map theme. All animations are gated behind a reduced-motion check,
   so `prefers-reduced-motion: reduce` (and the test environment) get a static UI.
 - Flight/airport/world data is fetched from external JSON datasets via
   TanStack Query; there is no backend service.

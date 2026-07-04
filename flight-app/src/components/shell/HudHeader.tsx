@@ -7,27 +7,20 @@ export function HudHeader() {
   const linked = Boolean(data) && !isLoading
 
   return (
-    <header className="flex items-center justify-between border-b border-border bg-card/40 px-5 py-2.5 backdrop-blur-sm">
-      <div className="flex items-baseline gap-3">
-        <span className="font-display text-base tracking-[0.22em] text-primary [text-shadow:var(--shadow-glow-green)]">
-          PHOSPHOR
+    <header className="flex min-w-0 items-center justify-between gap-3 border-b border-border bg-card/40 px-4 py-2.5 backdrop-blur-sm sm:px-5">
+      <div className="flex min-w-0 items-baseline gap-3">
+        <span className="font-display text-base tracking-[0.08em] text-foreground">
+          Flight Routes
         </span>
-        <span className="font-display text-base tracking-[0.22em] text-foreground">
-          // TRACON
-        </span>
-        <span className="ml-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-          flight route control
+        <span className="hidden font-mono text-[10px] tracking-widest text-muted-foreground uppercase sm:inline">
+          route planner
         </span>
       </div>
 
-      <div className="flex items-center gap-6 font-mono text-[11px] uppercase tracking-widest">
-        <div className="flex items-center gap-2">
-          <span className="text-muted-foreground">SECTOR</span>
-          <span className="text-data">GLOBAL-01</span>
-        </div>
-        <div className="flex items-center gap-2">
+      <div className="flex min-w-0 items-center gap-3 font-mono text-[10px] tracking-widest uppercase sm:gap-5 sm:text-[11px]">
+        <div className="hidden items-center gap-2 sm:flex">
           <span className="text-muted-foreground">UTC</span>
-          <span className="tabular-nums text-foreground">{clock}</span>
+          <span className="text-foreground tabular-nums">{clock}</span>
         </div>
         <div className="flex items-center gap-2">
           <span
@@ -38,9 +31,6 @@ export function HudHeader() {
             }
             aria-hidden
           />
-          <span className={linked ? "text-primary" : "text-accent"}>
-            {linked ? "LINK ESTABLISHED" : "ACQUIRING…"}
-          </span>
         </div>
       </div>
     </header>
