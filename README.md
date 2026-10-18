@@ -125,7 +125,3 @@ python app.py
 ## Academic Purpose
 
 This repository demonstrates the evolution of an **applied algorithmic complexity** solution: from an initial functional Flask implementation to a modern, typed, and testable React architecture.
-
-## Author
-
-Developed by **Luis Felipe Poma**.
